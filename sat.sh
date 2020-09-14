@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#mkdir -p /mnt/SH24 &> /dev/null
-
 #SETTINGS
 unpack=0
 repack=0
@@ -13,12 +11,13 @@ dm=0 #disable mounting
 error_a=0 #-a and -u
 error_u=0 #-u and -r in command
 error_r=0 #-a and -r in command
-mp=0 #change mount point dir, cant pass full path
+mp=0 #change mount point dir
 dis_um=0 #disable umounting for repack
 print_conf_passed=0
 enable_color="true"
 use_tool_binaries="true"
 do_resize="true"
+update="false"
 no_mode=0
 aonly=0
 ab=0
@@ -80,7 +79,6 @@ my_print () {
 	txt="$1"
 	if [[ $enable_color == "true" ]]
 	then
-		#printf "*** There is \e[31m nothing \e[0m to remove\n"
 		while [[ "$#" -gt 0 ]]; do
 			case "$1" in
 		        black) printf "\e[30m";;
@@ -162,6 +160,7 @@ while [[ "$#" -gt 0 ]]; do
         -dc) enable_color="false" ;;
         --resize) do_resize="true" ;;
         --install) chmod u+x bin/simg2img; chmod u+x bin/img2simg; exit 1;;
+        --update) update="true" ;;
         #-h) printf "-h\n" ;;
     esac
     shift
@@ -226,7 +225,32 @@ then
 	my_print "You can't use -ml with -a, -u, -r\n"
 	exit 1;
 fi
+if [[ $error_u == 1 && $update == "true" ]] || [[ $error_r == 1 && $update == "true" ]] || [[ $error_a == 1 && $update == "true" ]]
+then
+	my_print "You can't use --update with -a, -u, -r\n"
+	exit 1;
+fi
 
+#update section
+if [[ $update == "true" ]]
+then
+	update_dir="/home/sat-update"
+	mkdir -p "$update_dir"
+	cd "$update_dir"
+	git clone -b master https://github.com/SoulHunter24/android-tool.git
+	version-now=`cat "$start/.version"`
+	version-up=`cat ".version"`
+	if [[ $version-up -gt $version-now ]]
+	then
+		rm -f "$config_file"
+		mv "$start/$config_file" "$config_file"
+		mv -f "$update_dir/*" "$start"
+		rm -rf "$update_dir"
+		my_print "Tool was upgraded to $version-up version\n" bold green
+	else
+		my_print "It's already the newest version\n" yellow bold
+	fi
+fi
 
 #--- UNPACK CONFIG ---
 
@@ -352,10 +376,9 @@ then
 	fi
 fi
 
+
 #---------NO MODE AND REPACK------
 
-
-#cd $start
 # some repack and no-mode config
 
 #raw_dir : full path
