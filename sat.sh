@@ -237,18 +237,23 @@ then
 	update_dir="/home/sat-update"
 	mkdir -p "$update_dir"
 	cd "$update_dir"
-	git clone -b master https://github.com/SoulHunter24/android-tool.git
-	version-now=`cat "$start/.version"`
-	version-up=`cat ".version"`
-	if [[ $version-up -gt $version-now ]]
+	git clone -b testing https://github.com/SoulHunter24/android-tool.git
+	version_now=`cat "$start/.version"`
+	version_up=`cat "android-tool/.version"`
+	if [[ "$version_up" > "$version_now" ]]
 	then
-		rm -f "$config_file"
-		mv "$start/$config_file" "$config_file"
-		mv -f "$update_dir/*" "$start"
+		rm -rf android-tool/.git
+		if [[ -f "$start/$config_file" ]]
+		then
+			rm -f "android-tool/$config_file"
+			mv -f "$start/$config_file" "android-tool/$config_file"
+		fi
+		cp -r android-tool/* "$start/"
+		cp -r android-tool/.version "$start/"
 		rm -rf "$update_dir"
-		my_print "Tool was upgraded to $version-up version\n" bold green
+		my_print "Tool was upgraded to v$version_up\n" bold green
 	else
-		my_print "It's already the newest version\n" yellow bold
+		my_print "It's already the newest version [v$version_now]\n" yellow bold
 	fi
 fi
 
