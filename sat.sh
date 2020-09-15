@@ -27,11 +27,11 @@ start=`pwd`
 
 config_file="default.conf"
 
-
 mount_dir="/mnt/sat/loop"
 default_m_dir="/mnt/sat"
 raw_dir="$start/system.raw_img"
 sparse_dir="NOT_SPECIFIED"
+
 
 #load config
 if [[ -f $config_file ]]
@@ -42,11 +42,26 @@ then
 	m_dir=`cat $config_file | grep "M_DIR"`
 	def_m_dir=`cat $config_file | grep "m_mount_dir"`
 	
-	enable_color="${color##*=}"
-	use_tool_binaries="${binaries##*=}"
-	do_resize="${resize##*=}"
-	mount_dir="${m_dir##*=}"
+	if [[ "$color" != "" ]]
+	then
+		enable_color="${color##*=}"
+	fi
+	if [[ "$binaries" != "" ]]
+	then
+		use_tool_binaries="${binaries##*=}"
+	fi
+	if [[ "$resize" != "" ]]
+	then
+		do_resize="${resize##*=}"
+	fi
+	if [[ "$m_dir" != "" ]]
+	then
+		mount_dir="${m_dir##*=}"
+	fi
+	if [[ "$def_m_dir" != "" ]]
+	then
 	default_m_dir="${def_m_dir##*=}"
+	fi
 fi
 
 #---FUNCTIONS---
@@ -253,8 +268,9 @@ then
 		rm -rf "$update_dir"
 		my_print "Tool was upgraded to v$version_up\n" bold green
 	else
-		my_print "It's already the newest version [v$version_now]\n" yellow bold
+		my_print "It's the newest version [v$version_now]\n" yellow bold
 	fi
+	exit 1
 fi
 
 #--- UNPACK CONFIG ---
