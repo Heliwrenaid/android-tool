@@ -249,7 +249,7 @@ fi
 #update section
 if [[ $update == "true" ]]
 then
-	update_dir="/home/sat-update"
+	update_dir="sat-update"
 	mkdir -p "$update_dir"
 	cd "$update_dir"
 	git clone -b testing https://github.com/SoulHunter24/android-tool.git
@@ -265,11 +265,11 @@ then
 		fi
 		cp -r android-tool/* "$start/"
 		cp -r android-tool/.version "$start/"
-		rm -rf "$update_dir"
 		my_print "Tool was upgraded to v$version_up\n" bold green
 	else
 		my_print "It's the newest version [v$version_now]\n" yellow bold
 	fi
+	rm -rf "$update_dir"
 	exit 1
 fi
 
