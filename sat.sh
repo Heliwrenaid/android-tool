@@ -267,8 +267,9 @@ then
 		cp -r android-tool/.version "$start/"
 		my_print "Tool was upgraded to v$version_up\n" bold green
 	else
-		my_print "It's the newest version [v$version_now]\n" yellow bold
+		my_print "Nothing to upgrade. It's the newest version [v$version_now]\n" yellow bold
 	fi
+	cd "$start"
 	rm -rf "$update_dir"
 	exit 1
 fi
