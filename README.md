@@ -25,6 +25,7 @@ $ git clone https://github.com/SoulHunter24/android-tool.git
 download and unpack archive from [releases]
 
 # Usage
+SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command).
 Generally, in order to run a script type:
 ```sh
 $ ./sat.sh <OPTIONS>
