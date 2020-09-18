@@ -41,5 +41,5 @@ It will do everything automatically and keeps your settings in "default.conf" fi
 
 
    [releases]: <https://github.com/SoulHunter24/android-tool/releases>
-   [here]: <https://github.com/SoulHunter24/android-tool/documentation.md>
+   [here]: <https://github.com/SoulHunter24/android-tool/blob/testing/documentation.md>
    
