@@ -15,7 +15,7 @@ mp=0 #change mount point dir
 dis_um=0 #disable umounting for repack
 print_conf_passed=0
 enable_color="true"
-use_tool_binaries="true"
+use_tool_binaries="false"
 do_resize="true"
 update="false"
 no_mode=0
@@ -166,16 +166,16 @@ while [[ "$#" -gt 0 ]]; do
         -u|--unpack) read_d_args "${@:2}" ; error_u=1 ; unpack=1 ;;
         -r|--repack) read_d_args "${@:2}" ; error_r=1 ; repack=1 ;;
         -o|--overwrite) ow=1 ;;
-        -aonly) aonly=1 ;;
-        --debug) debug=1 ;;
+        -ab2a) aonly=1 ;;
+        -debug) debug=1 ;;
         -dm) dm=1 ;;
         -m|--mount) m="$2"; shift ; mp=1 ;;
         -ml) ml=1 ; no_mode=1 ;;
         -c|--clean) clean=1 ; no_mode=1 ;;
         -dc) enable_color="false" ;;
-        --resize) do_resize="true" ;;
-        --install) chmod u+x bin/simg2img; chmod u+x bin/img2simg; exit 1;;
-        --update) update="true" ;;
+        -resizeoff) do_resize="false" ;;
+        #--install) chmod u+x bin/simg2img; chmod u+x bin/img2simg; exit 1;;
+        -update) update="true" ;;
         #-h) printf "-h\n" ;;
     esac
     shift

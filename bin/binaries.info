@@ -1,0 +1,11 @@
+SAT needs to use mainly two binaries:
+-simg2img
+-img2simg
+
+If u can't install these packages using any package manager, then search and find it manually.
+When you found it, place to this "bin" folder, and rename as mentioned to "simg2img" and "img2simg".
+Run below commands:
+chmod u+x simg2img
+chmod u+x img2simg
+To force the SAT to use this binaries just add/modify below line in default.conf file:
+use_tool_binaries=true
