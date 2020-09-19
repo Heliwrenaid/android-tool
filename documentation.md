@@ -1,62 +1,62 @@
-#### Naming:
+### Naming:
 SPARSE_IMG - .img file that you want to unpack
 RAW_IMG – it is a unpacked .img file, it can be mount and modify on M_DIR
 M_DIR – mount point directory, when RAW_IMG is mounted (default: /mnt/sat/loop)
 F_SPARSE_IMG - final image file (after repack)
 (you can pass full path or just name to the above values)
 
-#### Auto mode:
+### Auto mode:
 Unpack SPARSE_IMG, then repack (it makes sense when using some additional options)
 ##### Usage:
-###
+#####
 ```sh
 ./sat.sh -a SPARSE_IMG F_SPARSE_IMG
 ```
 ##### or:
-###
+#####
 ```sh
 ./sat.sh -a SPARSE_IMG
 ```
 (F_SPARSE_IMG name will be generated automatically)
 
-#### Unpack mode:
+### Unpack mode:
 unpack SPARSE_IMG to RAW_IMG, then mount to not busy M_DIR
 ##### Usage:
-##
+#####
 ```sh
 ./sat.sh -u SPARSE_IMG RAW_IMG
 ```
 ##### or:
-#
+#####
 ```sh
 ./sat.sh -u SPARSE_IMG
 ```
 (RAW_IMG name will be generated automatically)
 
-#### Repack mode:
+### Repack mode:
 ##### Usage:
-###
+#####
 ```sh
 ./sat.sh -r RAW_IMG SPARSE_IMG
 ```
 Repack RAW_IMG to SPARSE_IMG
 ##### or:
-##
+#####
 ```sh
 ./sat.sh -r RAW_IMG 
 ```
 Repack RAW_IMG to SPARSE_IMG (automatically generated name)
 ##### or:
-##
+#####
 ```sh
 ./sat.sh -r
 ```
 will repack last created RAW_IMG to SPARSE_IMG (automatically generated name)
 
-#### No-mode:
+### No-mode:
 This mode is trigerred when none of previous modes is used. It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
 
-#### Additional options:
+### Additional options:
 ##### -m M_DIR
 change mountpoint directory to M_DIR
 ##### -o
@@ -74,7 +74,7 @@ where X is one of numbers: 26, 27, 28, 29 (you can pass how many numbers do 			y
 
 ##### -ab2a
 converts system from AB architecture to A-only.
-##### --debug
+##### -debug
 allow to display errors (by defualt some errors and messages are not displayed)
 ##### -ml
 prints list of mounted M_DIR’s
@@ -86,7 +86,7 @@ disable resize2fs -M RAW_IMG command before repacking
 just update the script (your changes in default.conf will be kept)
 
 
-#### Change default settings:
+### Change default settings:
 Some of default settings can be changed using „default.conf” text file. List of available values below:
 ##### enable_color=true/false
 when set to true, the tool will turn on colorful UI
@@ -100,7 +100,7 @@ change default M_DIR directory to PATH
 change directory, where tool creates new M_DIR’s to PATH
 
 
-#### Some example uses:
+### Some example uses:
 
 ##### I. reduce size of Generic System Image (GSI)
 You must know, which vndk folders you can delete. It depends of your device’s vendor. If you don’t know, then check which vndk version yours vendor has using Treble Info app (available in Google Play). To reduce size of .img file delete unnecessary vndk folders by running:
