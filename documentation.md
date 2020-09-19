@@ -59,6 +59,7 @@ This mode is trigerred:
 - before each repack
 - while auto mode is used
 - when none of previos modes (-u,-r,-a) are used
+#####
 It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
 
 
