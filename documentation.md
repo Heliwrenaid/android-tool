@@ -54,7 +54,13 @@ Repack RAW_IMG to SPARSE_IMG (automatically generated name)
 will repack last created RAW_IMG to SPARSE_IMG (automatically generated name)
 
 ### No-mode:
-This mode is trigerred when none of previous modes is used. It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
+This mode is trigerred:
+- after each 
+- before each repack
+- while auto mode is used
+- when none of previos modes (-u,-r,-a) is used
+It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
+
 
 ### Additional options:
 ##### -m M_DIR
@@ -85,6 +91,19 @@ disable resize2fs -M RAW_IMG command before repacking
 ##### -update
 just update the script (your changes in default.conf will be kept)
 
+### How it works?
+SAT basically follows with below proccess:
+##### Unpack mode:
+simg2img SPARSE_IMG RAW_IMG
+mkdir -p M_DIR
+mount RAW_DIR M_DIR
+##### No-mode
+Here SAT makes some changes in M_DIR (for example when -vndk, -ab2a etc. options is used).
+##### Repack-mode
+umount M_DIR
+e2fsck -fy RAW_IMG
+resize2fs -M RAW_IMG
+img2simg RAW_IMG F_SPARSE_IMG
 
 ### Change default settings:
 Some of default settings can be changed using „default.conf” text file. List of available values below:

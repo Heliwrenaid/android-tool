@@ -2,10 +2,14 @@ SAT needs to use mainly two binaries:
 -simg2img
 -img2simg
 
-If u can't install these packages using any package manager, then search and find it manually.
-When you found it, place to this "bin" folder, and rename as mentioned to "simg2img" and "img2simg".
-Run below commands:
-chmod u+x simg2img
-chmod u+x img2simg
-To force the SAT to use this binaries just add/modify below line in default.conf file:
-use_tool_binaries=true
+If you can't install these packages using any package manager, then try to use below:
+https://github.com/anestisb/android-simg2img
+
+Instructions:
+1. git clone https://github.com/anestisb/android-simg2img.git or download archive from releases
+2. cd android-simg2img
+3. run "make". As a result you should get simg2img and img2simg binaries (if necessary rename it to this names).
+4. Move binaries to "bin" folder in SAT directory
+5. chmod u+x simg2img img2simg
+6. Finally add/modify value in default.conf file: use_tool_binaries=true
+
