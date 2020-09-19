@@ -55,10 +55,10 @@ will repack last created RAW_IMG to SPARSE_IMG (automatically generated name)
 
 ### No-mode:
 This mode is trigerred:
-- after each 
+- after each unpack
 - before each repack
 - while auto mode is used
-- when none of previos modes (-u,-r,-a) is used
+- when none of previos modes (-u,-r,-a) are used
 It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
 
 
