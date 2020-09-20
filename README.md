@@ -12,29 +12,30 @@ In order to use SAT, you have to install some additional packages:
 - img2simg
 
 #### On Ubuntu: 
-```sh
+```
 $ sudo apt-get install simg2img img2simg
 ```
 
 # Installation
 To install SAT just clone this repo:
-```sh
+```
 $ git clone https://github.com/SoulHunter24/android-tool.git
 ```
 #### or 
 download and unpack archive from [releases]
 
 # Usage
-SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command).
+SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it with root access. (needed for mounting images).
 Generally, in order to run a script type:
-```sh
-$ ./sat.sh <OPTIONS>
+```
+$ su
+# ./sat.sh <OPTIONS>
 ```
 See a full documentation [here]
 
 # Update
 To update SAT run below command:
-```sh
+```
 $ ./sat.sh --update
 ```
 It will do everything automatically and keeps your settings in "default.conf" file.
