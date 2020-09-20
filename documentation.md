@@ -8,7 +8,7 @@ F_SPARSE_IMG - final image file (after repack)\
 (you can pass full path or just name to the above values)
 
 ### Auto mode:
-Unpack SPARSE_IMG, then repack (it makes sense when using some additional options)
+Unpack SPARSE_IMG, then repack (it makes sense when using some additional options)\
 **Usage:**
 ```
 ./sat.sh -a SPARSE_IMG F_SPARSE_IMG
@@ -20,7 +20,7 @@ Unpack SPARSE_IMG, then repack (it makes sense when using some additional option
 (F_SPARSE_IMG name will be generated automatically)
 
 ### Unpack mode:
-unpack SPARSE_IMG to RAW_IMG, then mount to not busy M_DIR
+unpack SPARSE_IMG to RAW_IMG, then mount to not busy M_DIR\
 **Usage:**
 ```
 ./sat.sh -u SPARSE_IMG RAW_IMG
@@ -36,12 +36,12 @@ unpack SPARSE_IMG to RAW_IMG, then mount to not busy M_DIR
 ```
 ./sat.sh -r RAW_IMG SPARSE_IMG
 ```
-Repack RAW_IMG to SPARSE_IMG
+Repack RAW_IMG to SPARSE_IMG\
 **or:**
 ```
 ./sat.sh -r RAW_IMG 
 ```
-Repack RAW_IMG to SPARSE_IMG (automatically generated name)
+Repack RAW_IMG to SPARSE_IMG (automatically generated name)\
 **or:**
 ```
 ./sat.sh -r
@@ -54,21 +54,21 @@ This mode is trigerred:
 - before each repack
 - while auto mode is used
 - when none of previos modes (-u,-r,-a) are used
-<br>
+
 It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
 
 
 ### Additional options:
 **-m M_DIR**\
-change mountpoint directory to M_DIR
+change mountpoint directory to M_DIR\
 **-o**\
-overwrite all files (if you don’t want overwrite files,	script will create new names/dirs)
+overwrite all files (if you don’t want overwrite files,	script will create new names/dirs)\
 **-dm**\
-(for unpack) disable automatic RAW_IMG mounting
+(for unpack) disable automatic RAW_IMG mounting\
 **-c**\
-(for no-mode) umount and delete all M_DIR’s
+(for no-mode) umount and delete all M_DIR’s\
 **-vndk X**\
-where X is one of numbers: 26, 27, 28, 29 (you can pass how many numbers do 			you want). It will automatically delete corresponding vndk folders:
+where X is one of numbers: 26, 27, 28, 29 (you can pass how many numbers do you want). It will automatically delete corresponding vndk folders:
 * /lib/vndk-X, 
 * /lib/vndk-sp-X,
 * /lib64/vndk-X,
@@ -98,6 +98,7 @@ mount RAW_DIR M_DIR
 ```
 **No-mode**\
 Here SAT makes some changes in M_DIR (for example when -vndk, -ab2a etc. options is used).\
+<br>
 **Repack-mode**
 
 ```
@@ -107,7 +108,7 @@ resize2fs -M RAW_IMG
 img2simg RAW_IMG F_SPARSE_IMG
 ```
 **Auto-mode**\
-Just perform all whole process.\
+Just perform all whole process.
 
 ### Change default settings:
 Some of default settings can be changed using „default.conf” text file. List of available values below:\
@@ -131,7 +132,7 @@ You must know, which vndk folders you can delete. It depends of your device’s 
 ```sh
 $ ./sat.sh -a SPARSE_IMG -vndk 26 27 29
 ```
-(in that case you will remove all folders related to 26, 27, 29 vndk version)\
+(in that case you will remove all folders related to 26, 27, 29 vndk version)
 
 It will unpack SPARSE_IMG to RAW_DIR, then mount it in M_DIR, deleting vndk folders, resize RAW_DIR and repack to F_SPARSE_IMG.
 
