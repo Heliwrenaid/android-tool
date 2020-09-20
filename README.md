@@ -22,6 +22,7 @@ To install SAT just clone this repo:
 $ git clone https://github.com/SoulHunter24/android-tool.git
 ```
 **or**\
+<br>
 download and unpack archive from **[releases]**
 
 # Usage
