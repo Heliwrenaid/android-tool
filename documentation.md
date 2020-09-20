@@ -127,7 +127,7 @@ change directory, where tool creates new M_DIR’s to PATH
 ### Some example uses:
 
 **I. reduce size of Generic System Image (GSI)**\
-You must know, which vndk folders you can delete. It depends of your device’s vendor. If you don’t know, then check which vndk version yours vendor has using Treble Info app (available in Google Play). To reduce size of .img file delete unnecessary vndk folders by running:
+You must know, which vndk folders you can delete. It depends of your device’s vendor. If you don’t know, then check vndk version using Treble Info app (available in Google Play). To reduce size of .img file delete unnecessary vndk folders by running:
 
 ```sh
 $ ./sat.sh -a SPARSE_IMG -vndk 26 27 29
@@ -140,7 +140,7 @@ It will unpack SPARSE_IMG to RAW_DIR, then mount it in M_DIR, deleting vndk fold
 ```
 ./sat.sh -a SPARSE_IMG -ab2a
 ```
-Note : If u want you can do 1. and 2. operation by running: 
+Note : If you want you can do 1. and 2. operation by running: 
 ```
 ./sat.sh -a SPARSE_IMG -vndk 26 27 29 -ab2a
 ```
