@@ -1,20 +1,20 @@
+##### Note: To use SAT you must run it with root access (needed to mount files).
+
 ### Naming:
-SPARSE_IMG - .img file that you want to unpack
-RAW_IMG – it is a unpacked .img file, it can be mount and modify on M_DIR
-M_DIR – mount point directory, when RAW_IMG is mounted (default: /mnt/sat/loop)
-F_SPARSE_IMG - final image file (after repack)
+SPARSE_IMG - .img file that you want to unpack\
+RAW_IMG – it is a unpacked .img file, it can be mount and modify on M_DIR\
+M_DIR – mount point directory, when RAW_IMG is mounted (default: /mnt/sat/loop)\
+F_SPARSE_IMG - final image file (after repack)\
 (you can pass full path or just name to the above values)
 
 ### Auto mode:
 Unpack SPARSE_IMG, then repack (it makes sense when using some additional options)
 ##### Usage:
-#####
-```sh
+```
 ./sat.sh -a SPARSE_IMG F_SPARSE_IMG
 ```
 ##### or:
-#####
-```sh
+```
 ./sat.sh -a SPARSE_IMG
 ```
 (F_SPARSE_IMG name will be generated automatically)
@@ -22,33 +22,29 @@ Unpack SPARSE_IMG, then repack (it makes sense when using some additional option
 ### Unpack mode:
 unpack SPARSE_IMG to RAW_IMG, then mount to not busy M_DIR
 ##### Usage:
-#####
-```sh
+```
 ./sat.sh -u SPARSE_IMG RAW_IMG
 ```
 ##### or:
 #####
-```sh
+```
 ./sat.sh -u SPARSE_IMG
 ```
 (RAW_IMG name will be generated automatically)
 
 ### Repack mode:
 ##### Usage:
-#####
-```sh
+```
 ./sat.sh -r RAW_IMG SPARSE_IMG
 ```
 Repack RAW_IMG to SPARSE_IMG
 ##### or:
-#####
-```sh
+```
 ./sat.sh -r RAW_IMG 
 ```
 Repack RAW_IMG to SPARSE_IMG (automatically generated name)
 ##### or:
-#####
-```sh
+```
 ./sat.sh -r
 ```
 will repack last created RAW_IMG to SPARSE_IMG (automatically generated name)
@@ -59,7 +55,7 @@ This mode is trigerred:
 - before each repack
 - while auto mode is used
 - when none of previos modes (-u,-r,-a) are used
-#####
+<br>
 It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
 
 
@@ -95,7 +91,7 @@ just update the script (your changes in default.conf will be kept)
 ### How it works?
 SAT basically follows with below proccess:
 ##### Unpack mode:
-#####
+
 ```
 simg2img SPARSE_IMG RAW_IMG
 mkdir -p M_DIR
@@ -104,7 +100,7 @@ mount RAW_DIR M_DIR
 ##### No-mode
 Here SAT makes some changes in M_DIR (for example when -vndk, -ab2a etc. options is used).
 ##### Repack-mode
-#####
+
 ```
 umount M_DIR
 e2fsck -fy RAW_IMG
@@ -141,19 +137,17 @@ $ ./sat.sh -a SPARSE_IMG -vndk 26 27 29
 It will unpack SPARSE_IMG to RAW_DIR, then mount it in M_DIR, deleting vndk folders, resize RAW_DIR and repack to F_SPARSE_IMG.
 
 ##### II. converting system from AB architecture to A-only.
-###
-```sh
+```
 ./sat.sh -a SPARSE_IMG -ab2a
 ```
 Note : If u want you can do 1. and 2. operation by running: 
-```sh
+```
 ./sat.sh -a SPARSE_IMG -vndk 26 27 29 -ab2a
 ```
 Tip : When you using -a option, it is nice to use it with -o (if you sure that tool won’t overwrite important files)
 
 ##### III. Unpack SPARSE_IMG and mount, do something with files, repack it
-###
-```sh
+```
 ./sat.sh -u SPARSE_IMG
 (do something with files in M_DIR)
 ./sat.sh -r 

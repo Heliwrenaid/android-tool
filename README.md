@@ -25,13 +25,12 @@ $ git clone https://github.com/SoulHunter24/android-tool.git
 download and unpack archive from [releases]
 
 # Usage
-SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it with root access. (needed for mounting images).
-Generally, in order to run a script type:
+SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it with root access (needed to mount files):
 ```
 $ su
 # ./sat.sh <OPTIONS>
 ```
-See a full documentation [here]
+##### See a full documentation [here]
 
 # Update
 To update SAT run below command:
