@@ -75,20 +75,20 @@ where X is one of numbers: 26, 27, 28, 29 (you can pass how many numbers do you 
 * /lib64/vndk-sp-X
 
 **-ab2a**\
-converts system from AB architecture to A-only.
+converts system from AB architecture to A-only.\
 **-debug**\
-allow to display errors (by defualt some errors and messages are not displayed)
+allow to display errors (by defualt some errors and messages are not displayed)\
 **-ml**\
-prints list of mounted M_DIR’s
+prints list of mounted M_DIR’s\
 **-dc**\
-disable colorful UI
+disable colorful UI\
 **-resizeoff**\
-disable resize2fs -M RAW_IMG command before repacking
+disable resize2fs -M RAW_IMG command before repacking\
 **-update**\
 just update the script (your changes in default.conf will be kept)
 
 ### How it works?
-SAT basically follows with below proccess:
+SAT basically follows with below proccess:\
 **Unpack mode:**
 
 ```
