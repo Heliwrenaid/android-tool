@@ -252,7 +252,7 @@ then
 	update_dir="sat-update"
 	mkdir -p "$update_dir"
 	cd "$update_dir"
-	git clone -b testing https://github.com/SoulHunter24/android-tool.git
+	git clone -b master https://github.com/SoulHunter24/android-tool.git
 	version_now=`cat "$start/.version"`
 	version_up=`cat "android-tool/.version"`
 	if [[ "$version_up" > "$version_now" ]]
