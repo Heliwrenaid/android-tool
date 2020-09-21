@@ -10,11 +10,11 @@ F_SPARSE_IMG - final image file (after repack)\
 ### Auto mode:
 Unpack SPARSE_IMG, then repack (it makes sense when using some additional options)\
 **Usage:**
-```
+```sh
 ./sat.sh -a SPARSE_IMG F_SPARSE_IMG
 ```
 **or:**
-```
+```sh
 ./sat.sh -a SPARSE_IMG
 ```
 (F_SPARSE_IMG name will be generated automatically)
@@ -22,28 +22,28 @@ Unpack SPARSE_IMG, then repack (it makes sense when using some additional option
 ### Unpack mode:
 unpack SPARSE_IMG to RAW_IMG, then mount to not busy M_DIR\
 **Usage:**
-```
+```sh
 ./sat.sh -u SPARSE_IMG RAW_IMG
 ```
 **or:**
-```
+```sh
 ./sat.sh -u SPARSE_IMG
 ```
 (RAW_IMG name will be generated automatically)
 
 ### Repack mode:
 **Usage:**
-```
+```sh
 ./sat.sh -r RAW_IMG SPARSE_IMG
 ```
 Repack RAW_IMG to SPARSE_IMG\
 **or:**
-```
+```sh
 ./sat.sh -r RAW_IMG 
 ```
 Repack RAW_IMG to SPARSE_IMG (automatically generated name)\
 **or:**
-```
+```sh
 ./sat.sh -r
 ```
 will repack last created RAW_IMG to SPARSE_IMG (automatically generated name)
@@ -91,7 +91,7 @@ just update the script (your changes in default.conf will be kept)
 SAT basically follows with below proccess:\
 **Unpack mode:**
 
-```
+```sh
 simg2img SPARSE_IMG RAW_IMG
 mkdir -p M_DIR
 mount RAW_DIR M_DIR
@@ -101,7 +101,7 @@ Here SAT makes some changes in M_DIR (for example when -vndk, -ab2a etc. options
 <br>
 **Repack-mode**
 
-```
+```sh
 umount M_DIR
 e2fsck -fy RAW_IMG
 resize2fs -M RAW_IMG
@@ -130,24 +130,24 @@ change directory, where tool creates new M_DIR’s to PATH
 You must know, which vndk folders you can delete. It depends of your device’s vendor. If you don’t know, then check vndk version using Treble Info app (available in Google Play). To reduce size of .img file delete unnecessary vndk folders by running:
 
 ```sh
-$ ./sat.sh -a SPARSE_IMG -vndk 26 27 29
+./sat.sh -a SPARSE_IMG -vndk 26 27 29
 ```
 (in that case you will remove all folders related to 26, 27, 29 vndk version)
 
 It will unpack SPARSE_IMG to RAW_DIR, then mount it in M_DIR, deleting vndk folders, resize RAW_DIR and repack to F_SPARSE_IMG.
 
 **II. converting system from AB architecture to A-only.**
-```
+```sh
 ./sat.sh -a SPARSE_IMG -ab2a
 ```
 Note : If you want you can do 1. and 2. operation by running: 
-```
+```sh
 ./sat.sh -a SPARSE_IMG -vndk 26 27 29 -ab2a
 ```
 Tip : When you using -a option, it is nice to use it with -o (if you sure that tool won’t overwrite important files)
 
 **III. Unpack SPARSE_IMG and mount, do something with files, repack it**
-```
+```sh
 ./sat.sh -u SPARSE_IMG
 (do something with files in M_DIR)
 ./sat.sh -r 
