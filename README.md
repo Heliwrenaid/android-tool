@@ -49,7 +49,7 @@ $ su
 # Update
 To update SAT run below command:
 ```
-$ ./sat.sh --update
+$ ./sat.sh -update
 ```
 It will do everything automatically and keeps your settings in "default.conf" file.
 
