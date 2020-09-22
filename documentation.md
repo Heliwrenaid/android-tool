@@ -7,6 +7,20 @@ M_DIR – mount point directory, when RAW_IMG is mounted (default: /mnt/sat/loop
 F_SPARSE_IMG - final image file (after repack)\
 (you can pass full path or just name to the above values)
 
+### Features for unpack/repack
+* possible to provide custom names/directories for RAW_IMG, F_SPARSE_IMG, M_DIR
+* SPARSE_IMG is a base name for RAW_IMG and F_SPARSE_IMG
+* finding alternative names/dirs if busy (RAW_IMG and F_SPARSE_IMG)
+* can create new mount point directories if default/provided M_DIR is busy
+* each mounted RAW_IMGs informations are stored, so no need to specify M_DIRs
+* prompt warning before overwriting files
+* script checks sense of used options eg. -a with -u
+* unmount and remove all M_DIRs created by program and stored informations about it (-c option)
+* colored UI
+* print list of mounted RAW_IMGs with corresponding M_DIRs (-ml option)
+* and many more ...
+
+
 ### Auto mode:
 Unpack SPARSE_IMG, then repack (it makes sense when using some additional options)\
 **Usage:**
