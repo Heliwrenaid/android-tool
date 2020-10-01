@@ -274,6 +274,19 @@ then
 	exit 1
 fi
 
+#detect device architecture
+arch=`uname -m`
+if [ $arch == "x86_64" ]
+then
+	arch="64"
+else
+    arch="32"
+fi
+
+#setting permissions for binaries
+chmod +x $start/bin/64-bit/simg2img $start/bin/32-bit/simg2img
+chmod +x $start/bin/64-bit/img2simg $start/bin/32-bit/img2simg
+
 #--- UNPACK CONFIG ---
 
 if [[ $unpack == 1 ]]
@@ -372,7 +385,7 @@ then
 	my_print "unpacking "; my_print "$source_dir_cp" -source; printf " to "; my_print "$raw_dir_cp \n" -raw; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		./bin/simg2img $source_dir $raw_dir
+		./bin/$arch-bit/simg2img $source_dir $raw_dir
 	else
 		simg2img $source_dir $raw_dir
 	fi
@@ -625,7 +638,7 @@ then
 	my_print "repacking "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$sparse_dir_cp \n" -sparse; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		./bin/img2simg $raw_dir $sparse_dir
+		./bin/$arch-bit/img2simg $raw_dir $sparse_dir
 	else
 		img2simg $raw_dir $sparse_dir
 	fi
