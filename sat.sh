@@ -23,6 +23,7 @@ aonly=0
 ab=0
 clean=0
 ml=0
+android_bin="/data/local/tmp"
 start=`pwd`
 
 config_file="default.conf"
@@ -279,13 +280,33 @@ arch=`uname -m`
 if [ $arch == "x86_64" ]
 then
 	arch="64"
+elif [[ $arch == arm* ]]
+then
+    arch="arm"
 else
-    arch="32"
+	arch="32"
 fi
 
-#setting permissions for binaries
+#setting permissions for binaries (PC)
 chmod +x $start/bin/64-bit/simg2img $start/bin/32-bit/simg2img
 chmod +x $start/bin/64-bit/img2simg $start/bin/32-bit/img2simg
+
+#check root access
+root=`id -u`
+if [[ $root -ne 0 ]]
+then
+	my_print "*** Some functionality will not work without root access\n" red bold
+fi
+#configure binaries for Android
+if [[ $arch == "arm" ]]
+then
+	mkdir -p "$android_bin"
+	cp -f $start/bin/arm/simg2img $android_bin/simg2img
+	cp -f $start/bin/arm/img2simg $android_bin/img2simg
+	chmod +x $android_bin/simg2img
+	chmod +x $android_bin/img2simg
+	
+fi
 
 #--- UNPACK CONFIG ---
 
@@ -385,7 +406,12 @@ then
 	my_print "unpacking "; my_print "$source_dir_cp" -source; printf " to "; my_print "$raw_dir_cp \n" -raw; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		./bin/$arch-bit/simg2img $source_dir $raw_dir
+		if [[ $arch == "arm" ]]
+		then
+			$android_bin/simg2img $source_dir $raw_dir
+		else
+			./bin/$arch-bit/simg2img $source_dir $raw_dir
+		fi
 	else
 		simg2img $source_dir $raw_dir
 	fi
@@ -638,7 +664,12 @@ then
 	my_print "repacking "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$sparse_dir_cp \n" -sparse; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		./bin/$arch-bit/img2simg $raw_dir $sparse_dir
+		if [[ $arch == "arm" ]]
+		then
+			$android_bin/img2simg $raw_dir $sparse_dir
+		else
+			./bin/$arch-bit/img2simg $raw_dir $sparse_dir
+		fi
 	else
 		img2simg $raw_dir $sparse_dir
 	fi
