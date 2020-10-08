@@ -23,7 +23,7 @@ aonly=0
 ab=0
 clean=0
 ml=0
-android_bin="/data/local/tmp"
+ANDROID_BIN="/data/local/tmp"
 start=`pwd`
 
 config_file="default.conf"
@@ -287,10 +287,6 @@ else
 	arch="32"
 fi
 
-#setting permissions for binaries (PC)
-chmod +x $start/bin/64-bit/simg2img $start/bin/32-bit/simg2img
-chmod +x $start/bin/64-bit/img2simg $start/bin/32-bit/img2simg
-
 #check root access
 root=`id -u`
 if [[ $root -ne 0 ]]
@@ -300,11 +296,11 @@ fi
 #configure binaries for Android
 if [[ $arch == "arm" ]]
 then
-	mkdir -p "$android_bin"
-	cp -f $start/bin/arm/simg2img $android_bin/simg2img
-	cp -f $start/bin/arm/img2simg $android_bin/img2simg
-	chmod +x $android_bin/simg2img
-	chmod +x $android_bin/img2simg
+	mkdir -p "$ANDROID_BIN"
+	cp -f $start/bin/arm/simg2img $ANDROID_BIN/simg2img
+	cp -f $start/bin/arm/img2simg $ANDROID_BIN/img2simg
+	chmod +x $ANDROID_BIN/simg2img
+	chmod +x $ANDROID_BIN/img2simg
 	
 fi
 
@@ -408,7 +404,7 @@ then
 	then
 		if [[ $arch == "arm" ]]
 		then
-			$android_bin/simg2img $source_dir $raw_dir
+			$ANDROID_BIN/simg2img $source_dir $raw_dir
 		else
 			./bin/$arch-bit/simg2img $source_dir $raw_dir
 		fi
@@ -666,7 +662,7 @@ then
 	then
 		if [[ $arch == "arm" ]]
 		then
-			$android_bin/img2simg $raw_dir $sparse_dir
+			$ANDROID_BIN/img2simg $raw_dir $sparse_dir
 		else
 			./bin/$arch-bit/img2simg $raw_dir $sparse_dir
 		fi
