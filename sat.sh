@@ -15,7 +15,6 @@ mp=0 #change mount point dir
 dis_um=0 #disable umounting for repack
 print_conf_passed=0
 enable_color="true"
-use_tool_binaries="false"
 do_resize="true"
 update="false"
 no_mode=0
@@ -23,74 +22,21 @@ aonly=0
 ab=0
 clean=0
 ml=0
-ANDROID_BIN="/data/local/tmp"
+
+SAT_DIR=unknown
+OS_TYPE=unknown
+ARCH=unknown
+
 start=`pwd`
 
-config_file="default.conf"
+config_file="$SAT_DIR/default.conf"
 
 mount_dir="/mnt/sat/loop"
 default_m_dir="/mnt/sat"
 raw_dir="$start/system.raw_img"
 sparse_dir="NOT_SPECIFIED"
 
-
-#load config
-if [[ -f $config_file ]]
-then
-	color=`cat $config_file | grep "enable_color"`
-	binaries=`cat $config_file | grep "use_tool_binaries"`
-	resize=`cat $config_file | grep "do_resize"`
-	m_dir=`cat $config_file | grep "M_DIR"`
-	def_m_dir=`cat $config_file | grep "m_mount_dir"`
-	
-	if [[ "$color" != "" ]]
-	then
-		enable_color="${color##*=}"
-	fi
-	if [[ "$binaries" != "" ]]
-	then
-		use_tool_binaries="${binaries##*=}"
-	fi
-	if [[ "$resize" != "" ]]
-	then
-		do_resize="${resize##*=}"
-	fi
-	if [[ "$m_dir" != "" ]]
-	then
-		mount_dir="${m_dir##*=}"
-	fi
-	if [[ "$def_m_dir" != "" ]]
-	then
-	default_m_dir="${def_m_dir##*=}"
-	fi
-fi
-
 #---FUNCTIONS---
-
-#finding alternative name/dir
-free_name () {
-	tmp="$1"
-	if [[ $tmp == /* ]]
-	then
-		dir=${tmp%/*}
-		tmp1=${tmp##*/}
-		name=${tmp1%.*}
-		ext=${tmp1##*.}
-	else
-		dir="$start"
-		name=${tmp%.*}
-		ext=${tmp##*.}
-	fi
-	iter=1
-	new_x="$dir/$name($iter).$ext"
-	while [[ -f "$new_x" ]]
-	do
-		iter=$(( $iter + 1 ))
-		new_x="$dir/$name($iter).$ext"
-	done
-	echo "$new_x"
-}
-
 my_print () {
 	txt="$1"
 	if [[ $enable_color == "true" ]]
@@ -123,6 +69,30 @@ my_print () {
 	fi
 }
 
+#finding alternative name/dir
+free_name () {
+	tmp="$1"
+	if [[ $tmp == /* ]]
+	then
+		dir=${tmp%/*}
+		tmp1=${tmp##*/}
+		name=${tmp1%.*}
+		ext=${tmp1##*.}
+	else
+		dir="$start"
+		name=${tmp%.*}
+		ext=${tmp##*.}
+	fi
+	iter=1
+	new_x="$dir/$name($iter).$ext"
+	while [[ -f "$new_x" ]]
+	do
+		iter=$(( $iter + 1 ))
+		new_x="$dir/$name($iter).$ext"
+	done
+	echo "$new_x"
+}
+
 print_config () {
 	if [[ $print_conf_passed == 0 ]]
 	then
@@ -148,6 +118,91 @@ print_config () {
 	raw_dir_cp="${raw_dir##*/}"
 	sparse_dir_cp="${sparse_dir##*/}"
 }
+
+#load config
+if [[ -f $config_file ]]
+then
+	color=`cat $config_file | grep "enable_color="`
+	binaries=`cat $config_file | grep "use_tool_binaries="`
+	resize=`cat $config_file | grep "do_resize="`
+	m_dir=`cat $config_file | grep "M_DIR="`
+	def_m_dir=`cat $config_file | grep "m_mount_dir="`
+	os_type=`cat $config_file | grep "OS_TYPE="`
+	arch=`cat $config_file | grep "ARCH="`
+	sat_dir=`cat $config_file | grep "SAT_DIR="`
+	
+	if [[ "$color" != "" ]]
+	then
+		enable_color="${color##*=}"
+	fi
+	if [[ "$binaries" != "" && "$OS_TYPE" == "Linux" ]]
+	then
+		use_tool_binaries="${binaries##*=}"
+	fi
+	if [[ "$resize" != "" ]]
+	then
+		do_resize="${resize##*=}"
+	fi
+	if [[ "$m_dir" != "" ]]
+	then
+		mount_dir="${m_dir##*=}"
+	fi
+	if [[ "$def_m_dir" != "" ]]
+	then
+		default_m_dir="${def_m_dir##*=}"
+	fi
+	if [[ "$os_type" != "" ]]
+	then
+		OS_TYPE="${os_type##*=}"
+	fi
+	if [[ "$arch" != "" ]]
+	then
+		ARCH="${arch##*=}"
+	fi
+	if [[ "$sat_dir" != "" ]]
+	then
+		SAT_DIR="${sat_dir##*=}"
+	fi
+else
+	my_print "!!! Configuration file ($config_file) was not found ..." yellow bold
+fi
+
+#abort if neccesery values is unknown
+if [[ "$SAT_DIR" == "unknown" ]]
+then
+	my_print "\nUnable to find SAT main directory\n" red bold
+	my_print "Please run install.sh again ...\n" red bold
+	my_print "or\n" red bold
+	my_print "... add SAT_DIR=/path/to/sat to $config_file\n\n" red bold
+	exit 1
+fi
+
+if [[ "$OS_TYPE" == "unknown" ]]
+then
+	my_print "\nOS type is not specifed\n" red bold
+	my_print "Please run install.sh again ...\n" red bold
+	my_print "or\n" red bold
+	my_print "... add OS_TYPE=Linux (or Android) to $config_file\n\n" red bold
+	exit 1
+fi
+
+if [[ "$ARCH" == "unknown" ]]
+then
+	my_print "\nDevice architecture is not detected\n" red bold
+	my_print "Please run install.sh again ...\n" red bold
+	my_print "or\n" red bold
+	my_print "... add ARCH=VAL to $config_file ... \n" red bold
+	my_print "... where VAL can be one of values: 32-bit,64-bit (for Linux) and arm,arm64 (for Android) \n\n" red bold
+	exit 1
+fi
+
+#choose options according to OS
+if [[ "$OS_TYPE" == "Linux" ]]
+then
+	use_tool_binaries="true"
+else
+	use_tool_binaries="false"
+fi
 
 #parse options
 declare -a dargs=()
@@ -175,7 +230,6 @@ while [[ "$#" -gt 0 ]]; do
         -c|--clean) clean=1 ; no_mode=1 ;;
         -dc) enable_color="false" ;;
         -resizeoff) do_resize="false" ;;
-        #--install) chmod u+x bin/simg2img; chmod u+x bin/img2simg; exit 1;;
         -update) update="true" ;;
         #-h) printf "-h\n" ;;
     esac
@@ -250,41 +304,29 @@ fi
 #update section
 if [[ $update == "true" ]]
 then
-	update_dir="sat-update"
+	update_dir="$SAT_DIR/sat-update"
 	mkdir -p "$update_dir"
 	cd "$update_dir"
 	git clone -b master https://github.com/SoulHunter24/android-tool.git
-	version_now=`cat "$start/.version"`
+	version_now=`cat "$SAT_DIR/.version"`
 	version_up=`cat "android-tool/.version"`
 	if [[ "$version_up" > "$version_now" ]]
 	then
 		rm -rf android-tool/.git
-		if [[ -f "$start/$config_file" ]]
+		if [[ -f "$config_file" ]]
 		then
-			rm -f "android-tool/$config_file"
-			mv -f "$start/$config_file" "android-tool/$config_file"
+			rm -f "android-tool/default.conf"
+			mv -f "config_file" "android-tool/default.conf"
 		fi
-		cp -r android-tool/* "$start/"
-		cp -r android-tool/.version "$start/"
+		cp -r android-tool/* "$SAT_DIR/"
+		cp -r android-tool/.version "$SAT_DIR/"
 		my_print "Tool was upgraded to v$version_up\n" bold green
 	else
 		my_print "Nothing to upgrade. It's the newest version [v$version_now]\n" yellow bold
 	fi
-	cd "$start"
+	cd "$SAT_DIR"
 	rm -rf "$update_dir"
 	exit 1
-fi
-
-#detect device architecture
-arch=`uname -m`
-if [ $arch == "x86_64" ]
-then
-	arch="64"
-elif [[ $arch == arm* ]]
-then
-    arch="arm"
-else
-	arch="32"
 fi
 
 #check root access
@@ -292,16 +334,6 @@ root=`id -u`
 if [[ $root -ne 0 ]]
 then
 	my_print "*** Some functionality will not work without root access\n" red bold
-fi
-#configure binaries for Android
-if [[ $arch == "arm" ]]
-then
-	mkdir -p "$ANDROID_BIN"
-	cp -f $start/bin/arm/simg2img $ANDROID_BIN/simg2img
-	cp -f $start/bin/arm/img2simg $ANDROID_BIN/img2simg
-	chmod +x $ANDROID_BIN/simg2img
-	chmod +x $ANDROID_BIN/img2simg
-	
 fi
 
 #--- UNPACK CONFIG ---
@@ -402,12 +434,7 @@ then
 	my_print "unpacking "; my_print "$source_dir_cp" -source; printf " to "; my_print "$raw_dir_cp \n" -raw; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		if [[ $arch == "arm" ]]
-		then
-			$ANDROID_BIN/simg2img $source_dir $raw_dir
-		else
-			./bin/$arch-bit/simg2img $source_dir $raw_dir
-		fi
+			./bin/$ARCH/simg2img $source_dir $raw_dir
 	else
 		simg2img $source_dir $raw_dir
 	fi
@@ -421,15 +448,15 @@ then
 	fi
 	
 	#save info
-	echo "$raw_dir" > .last.info
-	if [[ ! -f .mount.info ]]
+	echo "$raw_dir" > "$SAT_DIR/.last.info"
+	if [[ ! -f "$SAT_DIR/.mount.info" ]]
 	then
-		touch .mount.info
+		touch "$SAT_DIR/.mount.info"
 	fi
-	mou_inf=`cat .mount.info | grep ":$mount_dir;" | wc -l`
+	mou_inf=`cat $SAT_DIR/.mount.info | grep ":$mount_dir;" | wc -l`
 	if [[ $mou_inf == 0 ]]
 	then
-		echo "$raw_dir:$mount_dir;" >> .mount.info
+		echo "$raw_dir:$mount_dir;" >> "$SAT_DIR/.mount.info"
 	fi
 fi
 
@@ -450,15 +477,14 @@ then
 	#-rl : configure
 	if [[ $rl == 1 ]]
 	then
-		last=`cat .last.info`
+		last=`cat $SAT_DIR/.last.info`
 		raw_dir="$last"
-		#printf "$mount_dir\n"
 	fi
 	
 	#raw_dir : check
 	if ! [[ -s "$raw_dir" ]]
 	then
-		my_print "*** File is empty\n"
+		my_print "*** File is empty\n" red bold
 		exit 1
 	fi
 		
@@ -466,7 +492,7 @@ then
 	then
 		my_print "\n$raw_dir was found ... \n"
 	else
-		my_print "\n*** ERROR 404: $raw_dir was not found !!!\n"
+		my_print "\n*** ERROR 404: $raw_dir was not found !!!\n" red bold
 		exit 1
 	fi
 	
@@ -489,7 +515,6 @@ then
 		sparse_dir="$dest"
 	else
 		tmp="${raw_dir##*/}"
-		#czasem moze nie byc .raw_img sprawdzic czy po tym sa sobie rowne
 		sparse_dir="${tmp%.raw_img}-mod.img"
 		#raw_dir : full path
 	fi
@@ -524,7 +549,7 @@ then
 	then
 		if [[ $mp == 0 ]]
 		then
-			last=`cat .last.info`
+			last=`cat $SAT_DIR/.last.info`
 			raw_dir="$last"
 			#detecting mounpoint
 			tmp=`mount | grep "$raw_dir " | wc -l`
@@ -539,7 +564,6 @@ then
 	fi
 fi
 
-# zero sprawdzania poprawnosci
 # -m : configure !!! use if auto-detect works bad --- for repack and no-mode
 if [[ $mp == 1 ]]
 then
@@ -660,12 +684,7 @@ then
 	my_print "repacking "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$sparse_dir_cp \n" -sparse; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		if [[ $arch == "arm" ]]
-		then
-			$ANDROID_BIN/img2simg $raw_dir $sparse_dir
-		else
-			./bin/$arch-bit/img2simg $raw_dir $sparse_dir
-		fi
+		.$SAT_DIR/bin/$ARCH/img2simg $raw_dir $sparse_dir
 	else
 		img2simg $raw_dir $sparse_dir
 	fi
@@ -676,9 +695,9 @@ fi
 #mountlist
 if [[ $ml == 1 ]]
 then
-	if [[ -f .mount.info ]]
+	if [[ -f "$SAT_DIR/.mount.info" ]]
 	then
-		cp .mount.info .tmpfile.txt
+		cp "$SAT_DIR/.mount.info" .tmpfile.txt
 		
 		input=".tmpfile.txt"
 		echo "tmpfile2" > .tmpfile2.txt
@@ -704,50 +723,50 @@ fi
 
 if [[ $clean == 1 ]]
 then
-	if [[ ! -f .mount.info ]]
+	if [[ ! -f "$SAT_DIR/.mount.info" ]]
 	then
 		my_print "*** There is nothing to remove\n" red
 		exit 1
 	fi
 	my_print "*** Unmounting and deleting mountpoints folders\n..."
-	j=`cat .mount.info | wc -l`
+	j=`cat "$SAT_DIR/.mount.info" | wc -l`
 	while [ $j -ne 0 ]
 	do
-		str=`sed -n 1p .mount.info`
+		str=`sed -n 1p "$SAT_DIR/.mount.info"`
 		m="${str#*:}"
 		mpd="${m%?}"
 		umount "$mpd"
 		rm -rf "$mpd"
-		grep -v ":$mpd;" .mount.info > temp
-		mv temp .mount.info
+		grep -v ":$mpd;" "$SAT_DIR/.mount.info" > temp
+		mv temp "$SAT_DIR/.mount.info"
 		j=$(( $j - 1 ))
 	done
 	
-	j=`cat .mount.info | wc -l`
+	j=`cat "$SAT_DIR/.mount.info" | wc -l`
 	while [ $j -ne 0 ]
 	do
-		str=`sed -n 1p .mount.info`
+		str=`sed -n 1p "$SAT_DIR/.mount.info"`
 		r=${str%:}
 		i=`mount | grep "$r " | wc -l`
 		
 		while [ $i -ne 0 ]
 		do
-			str=`sed -n 1p .mount.info`
+			str=`sed -n 1p "$SAT_DIR/.mount.info"`
 			NAME=${str##*on }
 			mpd=${NAME% type*}
 			umount "$mpd"
 			rm -rf "$mpd"
-			grep -v ":$mpd;" .mount.info > temp
-			mv temp .mount.info
+			grep -v ":$mpd;" "$SAT_DIR/.mount.info" > temp
+			mv temp "$SAT_DIR/.mount.info"
 			i=$(( $i - 1 ))
 		done
 		
-		grep -v "$m" .mount.info > temp
-		mv temp .mount.info
+		grep -v "$m" "$SAT_DIR/.mount.info" > temp
+		mv temp "$SAT_DIR/.mount.info"
 		j=$(( $j - 1 ))
 	done
 	
 	rm -rf "$default_m_dir"
-	rm -rf .mount.info
+	rm -rf "$SAT_DIR/.mount.info"
 	my_print " Done\n"
 fi

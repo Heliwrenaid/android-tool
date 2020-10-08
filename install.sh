@@ -9,27 +9,16 @@ CONFIG_FILE="$SAT_DIR/default.conf"
 set_env () {
 	FILE="$1"
 	OS_TYPE="$2"
-	ENV=`head -1 "$FILE"`
-	if [[ "$ENV" != "#!/bin/bash" && "$OS_TYPE" == "Linux" ]]
+	FIRST_LINE=`head -1 "$FILE"`
+	if [[ "$FIRST_LINE" != "#!/bin/bash" && "$OS_TYPE" == "Linux" ]]
 	then
-		awk  -v awkvar="$ENV" '{sub(awkvar,"#!/bin/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE"
+		awk  -v awkvar="$FIRST_LINE" '{sub(awkvar,"#!/bin/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE"
 	fi
 	
-	if [[ "$ENV" != "#!/system/bin/bash" && "$OS_TYPE" == "Android" ]]
+	if [[ "$FIRST_LINE" != "#!/system/bin/bash" && "$OS_TYPE" == "Android" ]]
 	then
-		awk  -v awkvar="$ENV" '{sub(awkvar,"#!/system/bin/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE" 
+		awk  -v awkvar="$FIRST_LINE" '{sub(awkvar,"#!/system/bin/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE" 
 	fi
-}
-
-#no needed
-add_to_path_unused () {
-	CONTENT="$1"
-	FILE="$2"
-	echo 'export PATH="$PATH:' >> $FILE
-	sed '$s/$/y4qsjhr3163ga335at35323far2os/' $FILE > _list.txt_ && mv _list.txt_ $FILE
-	awk  -v awkvar="$CONTENT" '{sub("y4qsjhr3163ga335at35323far2os",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
-	sed '$s/$/"/' $FILE > _list.txt_ && mv -- _list.txt_ $FILE
-	source $FILE
 }
 
 add_to_path () {
@@ -45,7 +34,7 @@ install_on_android () {
 	mkdir -p $BIN_DIR
 	cp -f $SAT_DIR/bin/$ARCH/bash $BIN_DIR/bash
 	chmod 755 $BIN_DIR/bash
-	cp -f $SAT_DIR/sat.sh $BIN_DIR/sat
+	cp -f $SAT_DIR/sat $BIN_DIR/sat
 	chmod 755 $BIN_DIR/sat
 	
 	cp -f $SAT_DIR/bin/$ARCH/simg2img $BIN_DIR/simg2img
@@ -55,48 +44,17 @@ install_on_android () {
 	chmod +x $BIN_DIR/img2simg
 }
 
-rewrite_file () {
-	FILE="$1"
-	TXT="$2"
-	VAL="$3"
+mod_sat () {
+	FILE="$SAT_DIR/sat"
 	
-	input="$SAT_DIR/.tmpfile.txt"
-	tempf="$SAT_DIR/.tmpfile2.txt"
-	cp -f "$FILE" "$input"
+	CONTENT="SAT_DIR=$SAT_DIR"
+	awk  -v awkvar="$CONTENT" '{sub("SAT_DIR=unknown",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
 	
-	while IFS="" read -r line
-	do
-	case $line in
-		*"$TXT"*) echo "$VAL" >> "$tempf" ;;
-		*) echo "$line" >> "$tempf" ;;
-	esac
-	done < "$input"
-	cp -f "$tempf" "$FILE"
-	rm -f "$input"
-	rm -f "$tempf"
-}
-
-write_config () {
-	CONF_FILE="$1"
-	VAR="$2"
-	VALUE="$3"
+	CONTENT="OS_TYPE=$OS_TYPE"
+	awk  -v awkvar="$CONTENT" '{sub("OS_TYPE=unknown",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
 	
-	if [ -f "$CONF_FILE" ]
-	then
-		temp=`cat "$CONF_FILE" | grep "$VAR="`
-		varf="${temp##*=}"
-		if [ -z "$temp" ]
-		then
-			echo "$VAR=$VALUE" >> "$CONF_FILE"
-		else
-			if [ "$varf" != "$VALUE" ]
-			then
-				rewrite_file "$CONF_FILE" "$VAR=" "$VAR=$VALUE"
-			fi
-		fi
-	else
-		echo "$VAR=$VALUE" >> "$CONF_FILE"
-	fi
+	CONTENT="ARCH=$ARCH"
+	awk  -v awkvar="$CONTENT" '{sub("ARCH=unknown",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
 }
 
 #detect OS_TYPE ---------------------------------------------------
@@ -105,7 +63,7 @@ case $OS_TYPE in
 	*Linux*|*linux*|*LINUX*|*nix*|*NIX*)
 	check=`uname -m`
 	case $check in
-		*arm*) OS_TYPE="Android" ;;
+		*ar*) OS_TYPE="Android" ;;
 		*) OS_TYPE="Linux" ;;
 	esac
 	;;
@@ -139,12 +97,22 @@ echo "Architecture: $ARCH"
 echo " "
 
 #install ----------------------------------------------------------
+if [ -f "$SAT_DIR/sat.sh" ]
+then
+	cp -f $SAT_DIR/sat.sh $SAT_DIR/sat
+	
+	#setup shell directory
+	set_env "$SAT_DIR/sat" "$OS_TYPE"
+	
+	#setup variables for sat
+	mod_sat
+else
+	echo "Installation: failed (sat.sh was not found)"
+	exit 1
+fi
+
 if [ $OS_TYPE = "Linux" ]
 then
-	if [ -f "$SAT_DIR/sat.sh" ]
-	then
-		mv $SAT_DIR/sat.sh $SAT_DIR/sat
-	fi
 	chmod +x $SAT_DIR/sat
 	chmod +x $SAT_DIR/bin/$ARCH/simg2img $SAT_DIR/bin/$ARCH/img2simg
 	
@@ -154,28 +122,47 @@ then
 	elif [ -f ~/.bash_profile ]
 	then
 		add_to_path "$SAT_DIR" ~/.bash_profile	
+	elif [ -f ~/.zshrc ]
+	then
+		add_to_path "$SAT_DIR" ~/.zshrc
+	elif [ -f ~/.zprofile ]
+	then
+		add_to_path "$SAT_DIR" ~/.zprofile
+	elif [ -f ~/.cshrc ]
+	then
+		add_to_path "$SAT_DIR" ~/.cshrc
+	elif [ -f ~/.tcshrc ]
+	then
+		add_to_path "$SAT_DIR" ~/.tcshrc
+	elif [ -f ~/.login ]
+	then
+		add_to_path "$SAT_DIR" ~/.login
+	elif [ -f ~/.kshrc ]
+	then
+		add_to_path "$SAT_DIR" ~/.kshrc
 	elif [ -f ~/.profile ]
 	then
+		add_to_path "$SAT_DIR" ~/.profile
+	else
+		echo '#path to SAT' > ~/.profile
 		add_to_path "$SAT_DIR" ~/.profile
 	fi
 	
 else
-	if [ -f "$BIN_DIR/bash" ] && [ -f "$BIN_DIR/sat" ]
+	if [ -f "$BIN_DIR/bash" ] && [ -f "$BIN_DIR/sat" ] && [ -f "$BIN_DIR/simg2img" ] && [ -f "$BIN_DIR/img2simg" ]
 	then
-		if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ]
+		if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ] && [ -x "$BIN_DIR/simg2img" ] && [ -x "$BIN_DIR/img2simg" ]
 		then
 			echo "No need to install"
-			#exit 1
+			exit 1
 		else
-			set_env "$SAT_DIR/sat.sh" "$OS_TYPE"
 			install_on_android
 		fi
 	else
-		set_env "$SAT_DIR/sat.sh" "$OS_TYPE"
 		install_on_android
 	fi
 		
-	if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ]
+	if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ] && [ -x "$BIN_DIR/simg2img" ] && [ -x "$BIN_DIR/img2simg" ]
 	then
 		echo "Installation: success"
 	else
@@ -183,7 +170,3 @@ else
 	fi
 	echo " "
 fi
-
-#save to config_file ----------------------------------------------
-write_config "$CONFIG_FILE" "OS_TYPE" "$OS_TYPE"
-write_config "$CONFIG_FILE" "ARCH" "$ARCH"
