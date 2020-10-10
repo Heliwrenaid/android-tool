@@ -1,9 +1,10 @@
 #!/bin/bash
 
-BIN_DIR="/system/bin"
+BIN_DIR="/data/local/sat"
 SAT_DIR=`dirname "$(readlink -f "$0")"`
 OS_TYPE=`uname -o`
 CONFIG_FILE="$SAT_DIR/default.conf"
+TB="unknown"
 
 #set environment
 set_env () {
@@ -15,23 +16,23 @@ set_env () {
 		awk  -v awkvar="$FIRST_LINE" '{sub(awkvar,"#!/bin/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE"
 	fi
 	
-	if [[ "$FIRST_LINE" != "#!/system/bin/bash" && "$OS_TYPE" == "Android" ]]
+	if [[ "$FIRST_LINE" != "#!/data/local/sat/bash" && "$OS_TYPE" == "Android" ]]
 	then
-		awk  -v awkvar="$FIRST_LINE" '{sub(awkvar,"#!/system/bin/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE" 
+		awk  -v awkvar="$FIRST_LINE" '{sub(awkvar,"#!/data/local/sat/bash")}1' "$FILE" > temp.txt && mv temp.txt "$FILE" 
 	fi
 }
 
 add_to_path () {
-	PATH_TO_SAT='export PATH="$PATH:'"$1"'"'
+	PATH_TO_SAT='export PATH="'"$1"':$PATH"'
 	if [ -z "$(cat "$2" | grep "$PATH_TO_SAT")" ]
 	then
+		echo " " >> "$2"
 		echo "$PATH_TO_SAT" >> "$2"
 		source "$2"
 	fi
 }
 
 install_on_android () {
-	mkdir -p $BIN_DIR
 	cp -f $SAT_DIR/bin/$ARCH/bash $BIN_DIR/bash
 	chmod 755 $BIN_DIR/bash
 	cp -f $SAT_DIR/sat $BIN_DIR/sat
@@ -42,6 +43,10 @@ install_on_android () {
 	
 	cp -f $SAT_DIR/bin/$ARCH/img2simg $BIN_DIR/img2simg
 	chmod +x $BIN_DIR/img2simg
+
+	cp -f $SAT_DIR/bin/$ARCH/$TB $BIN_DIR/$TB
+	chmod 755 $BIN_DIR/$TB
+	
 }
 
 mod_sat () {
@@ -55,6 +60,13 @@ mod_sat () {
 	
 	CONTENT="ARCH=$ARCH"
 	awk  -v awkvar="$CONTENT" '{sub("ARCH=unknown",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
+
+	CONTENT="TB=$BIN_DIR/$TB"
+	awk  -v awkvar="$CONTENT" '{sub("TB=unknown",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
+
+	CONTENT="ANDROID_BIN=$BIN_DIR"
+	awk  -v awkvar="$CONTENT" '{sub("ANDROID_BIN=unknown",awkvar)}1' $FILE > temp.txt && mv temp.txt $FILE
+
 }
 
 #detect OS_TYPE ---------------------------------------------------
@@ -70,7 +82,7 @@ case $OS_TYPE in
 	*) echo "unkown OS type"; echo " "; exit 1 ;;
 esac
 
-#detect architecture ----------------------------------------------
+#detect architecture + choose TB----------------------------------------------
 if [ "$OS_TYPE" = "Android" ]
 then
 	ARCH=`getprop "ro.product.cpu.abilist"`
@@ -83,6 +95,14 @@ then
 	*arm64*) ARCH="arm64" ;;
 	*armeabi*) ARCH="arm" ;;
 	esac
+
+	if [ -e "/dev/loop0" ]
+	then
+		TB="toybox"
+	else
+		TB="toybox-old"
+	fi
+
 else
 	case "$(uname -m)" in
 	*x86_64*) ARCH="64-bit" ;;
@@ -105,7 +125,7 @@ then
 	set_env "$SAT_DIR/sat" "$OS_TYPE"
 	
 	#setup variables for sat
-	mod_sat
+	mod_sat 
 else
 	echo "Installation: failed (sat.sh was not found)"
 	exit 1
@@ -149,24 +169,23 @@ then
 	fi
 	
 else
-	if [ -f "$BIN_DIR/bash" ] && [ -f "$BIN_DIR/sat" ] && [ -f "$BIN_DIR/simg2img" ] && [ -f "$BIN_DIR/img2simg" ]
+	mount -o rw,remount /system
+	mkdir -p $BIN_DIR
+	if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ] && [ -x "$BIN_DIR/simg2img" ] && [ -x "$BIN_DIR/img2simg" ] && [ -x "$BIN_DIR/$TB" ]
 	then
-		if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ] && [ -x "$BIN_DIR/simg2img" ] && [ -x "$BIN_DIR/img2simg" ]
-		then
-			echo "No need to install"
-			exit 1
-		else
-			install_on_android
-		fi
+		echo "No need to install"
+		exit 1
 	else
 		install_on_android
 	fi
 		
-	if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ] && [ -x "$BIN_DIR/simg2img" ] && [ -x "$BIN_DIR/img2simg" ]
+	if [ -x "$BIN_DIR/bash" ] && [ -x "$BIN_DIR/sat" ] && [ -x "$BIN_DIR/simg2img" ] && [ -x "$BIN_DIR/img2simg" ] && [ -x "$BIN_DIR/$TB" ]
 	then
+		add_to_path "$BIN_DIR" /system/etc/mkshrc
 		echo "Installation: success"
 	else
 		echo "Installation: failed"
 	fi
 	echo " "
+	mount -o ro,remount /system
 fi

@@ -14,6 +14,7 @@ error_r=0 #-a and -r in command
 mp=0 #change mount point dir
 dis_um=0 #disable umounting for repack
 print_conf_passed=0
+use_tool_binaries="true"
 enable_color="true"
 do_resize="true"
 update="false"
@@ -23,9 +24,12 @@ ab=0
 clean=0
 ml=0
 
+#variables from installer.sh
 SAT_DIR=unknown
 OS_TYPE=unknown
 ARCH=unknown
+ANDROID_BIN=unknown
+TB=unknown
 
 start=`pwd`
 
@@ -167,41 +171,55 @@ else
 	my_print "!!! Configuration file ($config_file) was not found ..." yellow bold
 fi
 
-#abort if neccesery values is unknown
+#actions if neccesery values is unknown
 if [[ "$SAT_DIR" == "unknown" ]]
 then
-	my_print "\nUnable to find SAT main directory\n" red bold
+	my_print "\n\nUnable to find SAT main directory\n" red bold
 	my_print "Please run install.sh again ...\n" red bold
 	my_print "or\n" red bold
-	my_print "... add SAT_DIR=/path/to/sat to $config_file\n\n" red bold
+	my_print "add SAT_DIR=/path/to/sat to ${config_file##*/}\n\n" red bold
 	exit 1
 fi
 
 if [[ "$OS_TYPE" == "unknown" ]]
 then
-	my_print "\nOS type is not specifed\n" red bold
+	my_print "\n\nOS type is not specifed\n" red bold
 	my_print "Please run install.sh again ...\n" red bold
 	my_print "or\n" red bold
-	my_print "... add OS_TYPE=Linux (or Android) to $config_file\n\n" red bold
+	my_print "add OS_TYPE=Linux (or Android) to $config_file\n\n" red bold
 	exit 1
 fi
 
 if [[ "$ARCH" == "unknown" ]]
 then
-	my_print "\nDevice architecture is not detected\n" red bold
+	my_print "\n\nDevice architecture is not detected\n" red bold
 	my_print "Please run install.sh again ...\n" red bold
 	my_print "or\n" red bold
-	my_print "... add ARCH=VAL to $config_file ... \n" red bold
-	my_print "... where VAL can be one of values: 32-bit,64-bit (for Linux) and arm,arm64 (for Android) \n\n" red bold
+	my_print "add ARCH=VAL to $config_file ... \n" red bold
+	my_print "...where VAL can be one of values: 32-bit,64-bit (for Linux) and arm,arm64 (for Android) \n\n" red bold
 	exit 1
 fi
+
+if [[ "$TB" == "unknown" ]]
+then
+	use_tool_binaries="false"
+	my_print "\n\n!!! Can't detect toybox ... Mounting files can not work\n\n" red bold
+fi
+
+if [[ "$ANDROID_BIN" == "unknown" ]]
+then
+	use_tool_binaries="false"
+	my_print "\n\n!!! Can't detect binaries ... trying some workarounds\n" red bold
+	my_print "Also try to run install.sh again ...\n\n" red bold
+fi
+
 
 #choose options according to OS
 if [[ "$OS_TYPE" == "Linux" ]]
 then
-	use_tool_binaries="true"
+	BIN_DIR="./$SAT_DIR/bin/$ARCH"
 else
-	use_tool_binaries="false"
+	BIN_DIR="$ANDROID_BIN"
 fi
 
 #parse options
@@ -434,7 +452,7 @@ then
 	my_print "unpacking "; my_print "$source_dir_cp" -source; printf " to "; my_print "$raw_dir_cp \n" -raw; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-			./bin/$ARCH/simg2img $source_dir $raw_dir
+		$BIN_DIR/simg2img $source_dir $raw_dir
 	else
 		simg2img $source_dir $raw_dir
 	fi
@@ -443,7 +461,13 @@ then
 	then
 		my_print "mounting "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$mount_dir \n" -mount; my_print "..."
 		mkdir -p $mount_dir
-		mount $raw_dir $mount_dir
+		if [[ "$OS_TYPE" == "Android" ]]
+		then
+			LOOP=`"$TB" losetup -sf $raw_dir`
+			mount -t ext4 "$LOOP" $mount_dir
+		else
+			mount $raw_dir $mount_dir
+		fi
 		my_print " Done\n"
 	fi
 	
@@ -612,7 +636,7 @@ then
 		mv -f system/* "$mount_dir/"
 		rm -rf "$mount_dir/system"
 		
-		cp -rf "$start/files/etc" "$mount_dir"
+		cp -rf "$SAT_DIR/files/etc" "$mount_dir"
 		cd "$mount_dir/etc/init"
 		chmod 644 apex-setup.rc
 		chmod 644 init.treble-environ.rc
@@ -684,7 +708,7 @@ then
 	my_print "repacking "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$sparse_dir_cp \n" -sparse; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
 	then
-		.$SAT_DIR/bin/$ARCH/img2simg $raw_dir $sparse_dir
+		$BIN_DIR/img2simg $raw_dir $sparse_dir
 	else
 		img2simg $raw_dir $sparse_dir
 	fi
@@ -770,3 +794,4 @@ then
 	rm -rf "$SAT_DIR/.mount.info"
 	my_print " Done\n"
 fi
+ 
