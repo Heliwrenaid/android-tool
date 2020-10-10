@@ -123,6 +123,22 @@ print_config () {
 	sparse_dir_cp="${sparse_dir##*/}"
 }
 
+raw_to_loop () {
+	RAW="$1"
+	if [[ -f "$SAT_DIR/.loop.info" ]]
+	then
+		tmp=`cat $SAT_DIR/.loop.info | grep ";$RAW!"`
+		if [[ -n "$tmp" ]]
+		then
+			LOOP="${tmp%%:*}"
+		else
+			LOOP="unknown"
+		fi
+	else
+		LOOP="unknown"
+	fi
+	echo "$LOOP"
+}
 #load config
 if [[ -f $config_file ]]
 then
@@ -217,7 +233,7 @@ fi
 #choose options according to OS
 if [[ "$OS_TYPE" == "Linux" ]]
 then
-	BIN_DIR="./$SAT_DIR/bin/$ARCH"
+	BIN_DIR="$SAT_DIR/bin/$ARCH"
 else
 	BIN_DIR="$ANDROID_BIN"
 fi
@@ -421,6 +437,12 @@ then
 	fi
 	
 	#mount_dir : configure
+	raw_dir_copy="$raw_dir"
+	if [[ "$OS_TYPE" == "Android" ]]
+	then
+		raw_dir="$(raw_to_loop $raw_dir)"
+	fi
+	
 	tmp1=`mount | grep -F "$raw_dir on" | wc -l`
 	if [[ $tmp1 != 0 ]]
 	then
@@ -443,6 +465,7 @@ then
 		done
 		mount_dir="$new_mount_dir"
 	fi
+	raw_dir="$raw_dir_copy"
 	my_print "*** $raw_dir will be mounted in $mount_dir\n"
 
 	#print unpack config
@@ -481,6 +504,17 @@ then
 	if [[ $mou_inf == 0 ]]
 	then
 		echo "$raw_dir:$mount_dir;" >> "$SAT_DIR/.mount.info"
+	fi
+	
+	#save info for Android
+	if [[ ! -f "$SAT_DIR/.loop.info" ]]
+	then
+		touch "$SAT_DIR/.loop.info"
+	fi
+	loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;" | wc -l`
+	if [[ $loop_inf == 0 ]]
+	then
+		echo "$LOOP:$mount_dir;$raw_dir!" >> "$SAT_DIR/.loop.info"
 	fi
 fi
 
@@ -521,17 +555,23 @@ then
 	fi
 	
 	#detecting mounpoint
+	raw_dir_copy="$raw_dir"
+	if [[ "$OS_TYPE" == "Android" ]]
+	then
+		raw_dir="$(raw_to_loop $raw_dir)"
+	fi
 	tmp=`mount | grep "$raw_dir " | wc -l`
-	if [[ tmp != 0 ]]
+	if [[ $tmp != 0 ]]
 	then
 		tmp1=`mount | grep "$raw_dir "`
 		temp=${tmp1##*on }
 		temp2=${temp% type*}
 		mount_dir="$temp2"
 	else
-		my_print "*** $raw_dir is not mounted\n"
+		my_print "*** $raw_dir_copy is not mounted\n"
 		dis_um=1
 	fi
+	raw_dir="$raw_dir_copy"
 	
 	#sparse_dir : setting name + -d : config
 	if [[ $dest_opt == 1 ]]
@@ -575,7 +615,14 @@ then
 		then
 			last=`cat $SAT_DIR/.last.info`
 			raw_dir="$last"
+			
 			#detecting mounpoint
+			raw_dir_copy="$raw_dir"
+			if [[ "$OS_TYPE" == "Android" ]]
+			then
+				raw_dir="$(raw_to_loop $raw_dir)"
+			fi
+			
 			tmp=`mount | grep "$raw_dir " | wc -l`
 			if [[ $tmp != 0 ]]
 			then
@@ -584,6 +631,7 @@ then
 				temp2=${temp% type*}
 				mount_dir="$temp2"
 			fi
+			raw_dir="$raw_dir_copy"
 		fi
 	fi
 fi
@@ -673,11 +721,25 @@ then
 	my_print " Done\n"
 fi
 
-
 #repacking	
 if [[ $repack == 1 ]]
 then
 	cd "$start"
+	
+	#for Android: losetup --detach LOOP
+	if [[ "$OS_TYPE" == "Android" ]]
+	then
+		loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;" | wc -l`
+		if [[ "$loop_inf" != 0 ]]
+		then
+			loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;"`
+			tmp="${loop_inf%%:*}"
+			"$TB" losetup -d $tmp
+			
+			grep -v ":$tmp;" "$SAT_DIR/.loop.info" > temp.inf
+			mv -f temp.inf "$SAT_DIR/.loop.info"
+		fi
+	fi
 	if [[ $debug == 1 ]]
 	then
 		if [[ $dis_um == 0 ]]
@@ -704,6 +766,7 @@ then
 			resize2fs -M $raw_dir &> /dev/null
 		fi
 	fi
+			
 
 	my_print "repacking "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$sparse_dir_cp \n" -sparse; my_print "..."
 	if [[ $use_tool_binaries == "true" ]]
@@ -728,6 +791,13 @@ then
 		while IFS= read -r line
 		do
 			raw="${line%%:*}"
+			
+			raw_dir_copy="$raw"
+			if [[ "$OS_TYPE" == "Android" ]]
+			then
+				raw="$(raw_to_loop $raw)"
+			fi
+			
 			tmp1=`mount | grep "$raw "`
 			check=`cat .tmpfile2.txt | grep "$tmp1" | wc -l`
 			if [[ $check == 0 ]]
