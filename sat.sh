@@ -18,6 +18,7 @@ use_tool_binaries="true"
 enable_color="true"
 do_resize="true"
 update="false"
+resize_plus="false"
 no_mode=0
 aonly=0
 ab=0
@@ -88,11 +89,11 @@ free_name () {
 		ext=${tmp##*.}
 	fi
 	iter=1
-	new_x="$dir/$name($iter).$ext"
+	new_x="$dir/$name-$iter.$ext"
 	while [[ -f "$new_x" ]]
 	do
 		iter=$(( $iter + 1 ))
-		new_x="$dir/$name($iter).$ext"
+		new_x="$dir/$name-$iter.$ext"
 	done
 	echo "$new_x"
 }
@@ -139,6 +140,21 @@ raw_to_loop () {
 	fi
 	echo "$LOOP"
 }
+
+resize_p () {
+	RAW="$1"
+	SIZE="$2"
+	
+	e2fsck -fy $RAW &> /dev/null
+	resize2fs -M $RAW &> /dev/null
+	
+	RAW_SIZE=`du -m $RAW | awk '{ print $1 }'`
+	RAW_SIZE=$(( $RAW_SIZE + $SIZE ))
+	e2fsck -fy $RAW &> /dev/null
+	my_print "\nResizing ${RAW##/*} to $RAW_SIZE MiB\n" cyan bold
+	resize2fs -f $RAW $RAW_SIZE'M'
+}
+
 #load config
 if [[ -f $config_file ]]
 then
@@ -265,6 +281,7 @@ while [[ "$#" -gt 0 ]]; do
         -dc) enable_color="false" ;;
         -resizeoff) do_resize="false" ;;
         -update) update="true" ;;
+        -resizep) size="$2"; shift; resize_plus="true" ;;
         #-h) printf "-h\n" ;;
     esac
     shift
@@ -333,6 +350,11 @@ if [[ $error_u == 1 && $update == "true" ]] || [[ $error_r == 1 && $update == "t
 then
 	my_print "You can't use --update with -a, -u, -r\n"
 	exit 1;
+fi
+if [[ $resize_plus == "true" ]] && [[ -z $size ]]
+then
+	my_print "No size was specified\n" red bold
+	exit 1
 fi
 
 #update section
@@ -480,6 +502,14 @@ then
 		simg2img $source_dir $raw_dir
 	fi
 	my_print " Done\n"
+	
+	#increase raw_dir
+	if [[ "$resize_plus" == "true" ]]
+	then
+		resize_p $raw_dir $size
+		resize_plus="false"
+	fi
+	
 	if [[ $dm == 0 ]]
 	then
 		my_print "mounting "; my_print "$raw_dir_cp" -raw; printf " to "; my_print "$mount_dir \n" -mount; my_print "..."
@@ -664,6 +694,36 @@ then
 	ab=1
 fi
 
+#increase raw_dir
+if [[ $resize_plus == "true" ]]
+then
+	if [[ -n "$(mount | grep $raw_dir)" ]]
+	then
+		umount $mount_dir
+		resize_p $raw_dir $size
+		if [[ "$OS_TYPE" == "Android" ]]
+		then
+			LOOP=`"$TB" losetup -sf $raw_dir`
+			mount -t ext4 "$LOOP" $mount_dir
+		else
+			mount $raw_dir $mount_dir
+		fi
+		
+		#save info for Android - can be issues with that?
+		if [[ ! -f "$SAT_DIR/.loop.info" ]]
+		then
+			touch "$SAT_DIR/.loop.info"
+		fi
+		loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;" | wc -l`
+		if [[ $loop_inf == 0 ]]
+		then
+			echo "$LOOP:$mount_dir;$raw_dir!" >> "$SAT_DIR/.loop.info"
+		fi
+	else
+		resize_p $raw_dir $size
+	fi
+fi
+
 #print config
 if [[ $no_mode == 0 ]]
 then
@@ -673,7 +733,7 @@ then
 	fi
 fi
 
-#coverting to a-only
+#converting to a-only
 if [[ $aonly == 1 ]]
 then
 	if [[ $ab == 1 ]]
@@ -802,7 +862,12 @@ then
 			check=`cat .tmpfile2.txt | grep "$tmp1" | wc -l`
 			if [[ $check == 0 ]]
 			then
-				my_print "$tmp1\n" green bold
+				if [[ "$OS_TYPE" == "Android" ]]
+				then
+					my_print "${raw_dir_copy##*/}: $tmp1\n" green bold
+				else
+					my_print "$tmp1\n" green bold
+				fi
 			fi
 			echo "$tmp1" >> .tmpfile2.txt
 		done < "$input"
@@ -822,14 +887,14 @@ then
 		my_print "*** There is nothing to remove\n" red
 		exit 1
 	fi
-	my_print "*** Unmounting and deleting mountpoints folders\n..."
+	my_print "*** Unmount and delete M_DIR's + clear SAT history\n..."
 	j=`cat "$SAT_DIR/.mount.info" | wc -l`
 	while [ $j -ne 0 ]
 	do
 		str=`sed -n 1p "$SAT_DIR/.mount.info"`
 		m="${str#*:}"
 		mpd="${m%?}"
-		umount "$mpd"
+		umount "$mpd" &> /dev/null
 		rm -rf "$mpd"
 		grep -v ":$mpd;" "$SAT_DIR/.mount.info" > temp
 		mv temp "$SAT_DIR/.mount.info"
@@ -848,7 +913,7 @@ then
 			str=`sed -n 1p "$SAT_DIR/.mount.info"`
 			NAME=${str##*on }
 			mpd=${NAME% type*}
-			umount "$mpd"
+			umount "$mpd" &> /dev/null
 			rm -rf "$mpd"
 			grep -v ":$mpd;" "$SAT_DIR/.mount.info" > temp
 			mv temp "$SAT_DIR/.mount.info"
@@ -861,7 +926,12 @@ then
 	done
 	
 	rm -rf "$default_m_dir"
-	rm -rf "$SAT_DIR/.mount.info"
+	rm -f "$SAT_DIR/.mount.info"
+	rm -f "$SAT_DIR/.last.info"
+	if [[ -e "$SAT_DIR/.loop.info" ]]
+	then
+		rm -f "$SAT_DIR/.loop.info"
+	fi
 	my_print " Done\n"
 fi
  
