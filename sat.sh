@@ -19,6 +19,8 @@ enable_color="true"
 do_resize="true"
 update="false"
 resize_plus="false"
+resize_raw="false"
+del_source="false"
 no_mode=0
 aonly=0
 ab=0
@@ -151,8 +153,9 @@ resize_p () {
 	RAW_SIZE=`du -m $RAW | awk '{ print $1 }'`
 	RAW_SIZE=$(( $RAW_SIZE + $SIZE ))
 	e2fsck -fy $RAW &> /dev/null
-	my_print "\nResizing ${RAW##/*} to $RAW_SIZE MiB\n" cyan bold
-	resize2fs -f $RAW $RAW_SIZE'M'
+	my_print "\nResizing "; my_print "${RAW##*/}" -raw; my_print " to "; my_print "$RAW_SIZE MB\n..." green bold
+	resize2fs -f $RAW $RAW_SIZE'M' &> /dev/null
+	my_print "Done\n\n"
 }
 
 #load config
@@ -281,7 +284,9 @@ while [[ "$#" -gt 0 ]]; do
         -dc) enable_color="false" ;;
         -resizeoff) do_resize="false" ;;
         -update) update="true" ;;
-        -resizep) size="$2"; shift; resize_plus="true" ;;
+        -free) size="$2"; shift; resize_plus="true" ;;
+        -ds) del_source="true" ;;
+        #-freeraw) size="$3"; dest_raw="$2"; shift ; resize_raw="true" ;;
         #-h) printf "-h\n" ;;
     esac
     shift
@@ -546,6 +551,14 @@ then
 	then
 		echo "$LOOP:$mount_dir;$raw_dir!" >> "$SAT_DIR/.loop.info"
 	fi
+	
+	#delete source_dir
+	if [[ "$del_source" == "true" ]] && [[ -e $raw_dir ]] && [[ -s $raw_dir ]]
+	then
+		my_print "\nDeleting "; my_print "$source_dir_cp" -source
+		rm -f $source_dir
+		my_print "\n...Done\n"
+	fi
 fi
 
 
@@ -692,36 +705,6 @@ fi
 if [[ -d "$mount_dir/system" ]] && [[ ! -z "$(ls -A $mount_dir/system)" ]]
 then
 	ab=1
-fi
-
-#increase raw_dir
-if [[ $resize_plus == "true" ]]
-then
-	if [[ -n "$(mount | grep $raw_dir)" ]]
-	then
-		umount $mount_dir
-		resize_p $raw_dir $size
-		if [[ "$OS_TYPE" == "Android" ]]
-		then
-			LOOP=`"$TB" losetup -sf $raw_dir`
-			mount -t ext4 "$LOOP" $mount_dir
-		else
-			mount $raw_dir $mount_dir
-		fi
-		
-		#save info for Android - can be issues with that?
-		if [[ ! -f "$SAT_DIR/.loop.info" ]]
-		then
-			touch "$SAT_DIR/.loop.info"
-		fi
-		loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;" | wc -l`
-		if [[ $loop_inf == 0 ]]
-		then
-			echo "$LOOP:$mount_dir;$raw_dir!" >> "$SAT_DIR/.loop.info"
-		fi
-	else
-		resize_p $raw_dir $size
-	fi
 fi
 
 #print config

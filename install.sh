@@ -197,6 +197,11 @@ then
 		add_to_path "$SAT_DIR" ~/.profile
 	fi
 	
+	if [ -x "$SAT_DIR/sat" ] && [ -x "$SAT_DIR/bin/$ARCH/simg2img" ] && [ -x "$SAT_DIR/bin/$ARCH/img2simg" ]
+	then
+		echo "Installation: success"
+		echo " "
+	fi
 else
 	mount -o rw,remount /system
 	mkdir -p $BIN_DIR
@@ -224,3 +229,4 @@ else
 	echo " "
 	mount -o ro,remount /system
 fi
+ 
