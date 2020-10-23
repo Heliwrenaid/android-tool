@@ -20,26 +20,57 @@ SAT is a script created for unpack/repack image files (especially Generic System
 
 # Requirements
 
-In order to use SAT, you have to install some additional packages:
-- simg2img
-- img2simg
-
-**On Ubuntu:**
-```
-$ sudo apt-get install simg2img img2simg
-```
+**Linux**
+From version 2.0 all neccessery binaries are pre-builded, so you don't have to install it manually.\
+<br>
+**Android**
+In order to use SAT on Android device you must have:
+* rooted phone
+* installed busybox (if you haven't it, just download any busybox installer apk eg. from Google Playstore)
+* terminal emulator (recommended [Termux])
 
 # Installation
-To install SAT just clone this repo:
+
+**Linux**
+__I. Download__
+In terminal:\
 ```
 $ git clone https://github.com/SoulHunter24/android-tool.git
 ```
 **or**\
 <br>
-download and unpack archive from **[releases]**
+download and unpack archive from **[releases]**\
+
+__II. Run installation script__
+In terminal:\
+```
+$ cd /path/to/sat/directory
+$ chmod +x install.sh
+$ ./install.sh
+```
+The script will detect your system OS and architecture automatically.\
+
+**Android**
+__I. Download__
+There are two options for installing SAT on Android:\
+**(1)** using terminal emulator\
+**(2)** using TWRP\
+
+**(1) Terminal**
+I. Download and unpack archive from **[releases]**\
+II. Open terminal and run:\
+```
+$ cd /path/to/sat/directory
+$ su
+# chmod +x install.sh
+# sh install.sh
+```
+
+**(2) TWRP**
+Just download **[this]** file and flash it in TWRP.\
 
 # Usage
-SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it with root access (needed to mount files):
+SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it in terminal with root access (needed to mount files):
 ```
 $ su
 # ./sat.sh <OPTIONS>
@@ -56,4 +87,6 @@ It will do everything automatically and keeps your settings in "default.conf" fi
 
    [releases]: <https://github.com/SoulHunter24/android-tool/releases>
    [here]: <https://github.com/SoulHunter24/android-tool/blob/master/documentation.md>
+   [this]: <https://github.com/SoulHunter24/android-tool/releases>
+   [Termux]: <https://termux.com/>
    

@@ -18,6 +18,8 @@ F_SPARSE_IMG - final image file (after repack)\
 * unmount and remove all M_DIRs created by program and stored informations about it (-c option)
 * colored UI
 * print list of mounted RAW_IMGs with corresponding M_DIRs (-ml option)
+* set up avalaible free space of mounted RAW_DIR
+* delete source SPARSE_IMG after unpack it (useful for Android phones with low free memory)
 * and many more ...
 
 
@@ -98,6 +100,11 @@ prints list of mounted M_DIR’s\
 disable colorful UI\
 **-resizeoff**\
 disable resize2fs -M RAW_IMG command before repacking\
+**-free SIZE**\
+(unpack option) set up free space for unpacked RAW_DIR, where SIZE is values in MB\
+Note: when RAW_DIR will be mounted the available free space will be a little lower than SIZE\
+**-ds**\
+(unpack option) delete source SPARSE_IMG after unpack it\
 **-update**\
 just update the script (your changes in default.conf will be kept)
 
@@ -165,4 +172,10 @@ Tip : When you using -a option, it is nice to use it with -o (if you sure that t
 ./sat.sh -u SPARSE_IMG
 (do something with files in M_DIR)
 ./sat.sh -r 
+```
+
+**IV. Unpack SPARSE_IMG, delete it, set up 300 MB of free space for RAW_DIR and mount it on M_DIR**
+```sh
+./sat.sh -u SPARSE_IMG -ds -free 300
+(now you can add some files in M_DIR)
 ```
