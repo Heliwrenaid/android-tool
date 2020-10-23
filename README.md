@@ -20,10 +20,10 @@ SAT is a script created for unpack/repack image files (especially Generic System
 
 # Requirements
 
-**Linux**
+**Linux**\
 From version 2.0 all neccessery binaries are pre-builded, so you don't have to install it manually.\
-<br>
-**Android**
+
+**Android**\
 In order to use SAT on Android device you must have:
 * rooted phone
 * installed busybox (if you haven't it, just download any busybox installer apk eg. from Google Playstore)
@@ -31,34 +31,36 @@ In order to use SAT on Android device you must have:
 
 # Installation
 
-**Linux**
-__I. Download__
-In terminal:\
+**Linux**\
+<br>
+**I. Download**\
+In terminal:
 ```
 $ git clone https://github.com/SoulHunter24/android-tool.git
 ```
 **or**\
 <br>
-download and unpack archive from **[releases]**\
+download and unpack archive from **[releases]**
 
-__II. Run installation script__
-In terminal:\
+**II. Run installation script**\
+In terminal:
 ```
 $ cd /path/to/sat/directory
 $ chmod +x install.sh
 $ ./install.sh
 ```
-The script will detect your system OS and architecture automatically.\
+The script will detect your system OS and architecture automatically.
 
-**Android**
-__I. Download__
+**Android**\
+<br>
+**I. Download**\
 There are two options for installing SAT on Android:\
 **(1)** using terminal emulator\
-**(2)** using TWRP\
+**(2)** using TWRP
 
-**(1) Terminal**
+**(1) Terminal**\
 I. Download and unpack archive from **[releases]**\
-II. Open terminal and run:\
+II. Open terminal and run:
 ```
 $ cd /path/to/sat/directory
 $ su
@@ -66,8 +68,8 @@ $ su
 # sh install.sh
 ```
 
-**(2) TWRP**
-Just download **[this]** file and flash it in TWRP.\
+**(2) TWRP**\
+Just download **[this]** file and flash it in TWRP.
 
 # Usage
 SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it in terminal with root access (needed to mount files):
