@@ -1,6 +1,6 @@
 # About the project
 
-SAT is a script created for unpack/repack image files (especially Generic System Images). The aim of SAT is to make some steps simple and automatically. It also contains some features related to GSIs:
+SAT is a script created for unpack/repack image files (especially Generic System Images).It is available on Linux and Android devices. The main aim of SAT is to make some steps simple and automatically. It also contains some features related to GSIs:
 
 - reduce size of system image file
 - convert system from AB architecture to A-only
@@ -20,10 +20,10 @@ SAT is a script created for unpack/repack image files (especially Generic System
 
 # Requirements
 
-**Linux**\
-From version 2.0 all neccessery binaries are pre-builded, so you don't have to install it manually.\
+**--- Linux ---**\
+From version 2.0 all neccessery binaries are pre-builded, so you don't have to install it manually.
 
-**Android**\
+**--- Android ---**\
 In order to use SAT on Android device you must have:
 * rooted phone
 * installed busybox (if you haven't it, just download any busybox installer apk eg. from Google Playstore)
@@ -31,7 +31,7 @@ In order to use SAT on Android device you must have:
 
 # Installation
 
-**Linux**\
+**--- Linux ---**\
 <br>
 **I. Download**\
 In terminal:
@@ -51,9 +51,8 @@ $ ./install.sh
 ```
 The script will detect your system OS and architecture automatically.
 
-**Android**\
+**--- Android ---**\
 <br>
-**I. Download**\
 There are two options for installing SAT on Android:\
 **(1)** using terminal emulator\
 **(2)** using TWRP
