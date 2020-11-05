@@ -1,21 +1,21 @@
 # About the project
 
-SAT is a script created for unpack/repack image files (especially Generic System Images).It is available on Linux and Android devices. The main aim of SAT is to make some steps simple and automatically. It also contains some features related to GSIs:
+SAT is a script created for unpack/repack image files (especially Generic System Images). It is available on Linux and Android devices. The main aim of SAT is to make some steps simple and automatically. It also contains some features related to GSIs:
 
 - reduce size of system image file
 - convert system from AB architecture to A-only
 
 **Features for unpack/repack**
-* possible to provide custom names/directories for RAW_IMG, F_SPARSE_IMG, M_DIR
-* SPARSE_IMG is a base name for RAW_IMG and F_SPARSE_IMG
-* finding alternative names/dirs if busy (RAW_IMG and F_SPARSE_IMG)
-* can create new mount point directories if default/provided M_DIR is busy
-* each mounted RAW_IMGs informations are stored, so no need to specify M_DIRs
+* automatically creating names for output files/directories
 * prompt warning before overwriting files
-* script checks sense of used options eg. -a with -u
-* unmount and remove all M_DIRs created by program and stored informations about it (-c option)
+* finding alternative names if file/directory exists
+* automatically creating and mounting mount points
+* option for umount and delete all mount points created by SAT
 * colored UI
-* print list of mounted RAW_IMGs with corresponding M_DIRs (-ml option)
+* printing information of mounted files
+* many options for set names of output files, mount points, etc.
+* resizing file to minimum size
+* enlarge file in order to set a free space after mounting it
 * and many more ...
 
 # Requirements
@@ -68,26 +68,25 @@ $ su
 ```
 
 **(2) TWRP**\
-Just download **[this]** file and flash it in TWRP.
+Just download the special archive from **[releases]** and flash it in TWRP.
 
 # Usage
 SAT has basiclly 4 modes (auto, unpack, repack, no-mode). In each mode you can use some addiotional options (possible to use few options in one command). To use SAT you must run it in terminal with root access (needed to mount files):
 ```
 $ su
-# ./sat.sh <OPTIONS>
+# sat <OPTIONS>
 ```
 **See a full documentation [here]**
 
 # Update
 To update SAT run below command:
 ```
-$ ./sat.sh -update
+$ sat -update
 ```
 It will do everything automatically and keeps your settings in "default.conf" file.
 
 
    [releases]: <https://github.com/SoulHunter24/android-tool/releases>
    [here]: <https://github.com/SoulHunter24/android-tool/blob/master/documentation.md>
-   [this]: <https://github.com/SoulHunter24/android-tool/releases>
    [Termux]: <https://termux.com/>
    

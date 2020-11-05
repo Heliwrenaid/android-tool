@@ -153,9 +153,9 @@ resize_p () {
 	RAW_SIZE=`du -m $RAW | awk '{ print $1 }'`
 	RAW_SIZE=$(( $RAW_SIZE + $SIZE ))
 	e2fsck -fy $RAW &> /dev/null
-	my_print "\nResizing "; my_print "${RAW##*/}" -raw; my_print " to "; my_print "$RAW_SIZE MB\n..." green bold
+	my_print "\nResizing "; my_print "${RAW##*/}" -raw; my_print " to "; my_print "$RAW_SIZE MB\n" green bold; my_print "..."
 	resize2fs -f $RAW $RAW_SIZE'M' &> /dev/null
-	my_print "Done\n\n"
+	my_print " Done\n\n"
 }
 
 #load config
@@ -169,6 +169,9 @@ then
 	os_type=`cat $config_file | grep "OS_TYPE="`
 	arch=`cat $config_file | grep "ARCH="`
 	sat_dir=`cat $config_file | grep "SAT_DIR="`
+	toy=`cat $config_file | grep "TB="`
+	andr_bin=`cat $config_file | grep "ANDROID_BIN="`
+	
 	
 	if [[ "$color" != "" ]]
 	then
@@ -201,6 +204,14 @@ then
 	if [[ "$sat_dir" != "" ]]
 	then
 		SAT_DIR="${sat_dir##*=}"
+	fi
+		if [[ "$toy" != "" ]]
+	then
+		TB="${toy##*=}"
+	fi
+		if [[ "$andr_bin" != "" ]]
+	then
+		ANDROID_BIN="${andr_bin##*=}"
 	fi
 else
 	my_print "!!! Configuration file ($config_file) was not found ..." yellow bold
