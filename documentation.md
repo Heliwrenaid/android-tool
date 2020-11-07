@@ -49,9 +49,9 @@ sat -r
 will repack **last** created RAW_IMG to OUT_SPARSE_IMG (automatically generated name)
 
 ### No-mode:
-This mode is trigerred:\
-- after each unpack\
-- before each repack\
+This mode is trigerred:
+- after each unpack
+- before each repack
 - when none of -a, -u, -r mode is used\
 It can be uses with some additional options. It operates on last created RAW_IMG (can be changed by -m option)
 
@@ -91,10 +91,7 @@ Note: when RAW_DIR will be mounted the available free space will be a little low
 just update the script (your changes in default.conf will be kept)
 
 ### How it works?
-SAT basically follows with below proccess:\
-
-\
-\
+SAT basically follows with below proccess:
 
 **Unpack mode:**
 
@@ -104,7 +101,7 @@ mkdir -p M_DIR
 mount RAW_DIR M_DIR
 ```
 **No-mode**\
-Here SAT makes some changes in M_DIR (for example when -vndk, -ab2a etc. options is used).\
+Here SAT makes some changes in M_DIR (for example when -vndk, -ab2a etc. options is used).
 
 **Repack-mode**
 
@@ -116,10 +113,6 @@ img2simg RAW_IMG OUT_SPARSE_IMG
 ```
 **Auto-mode**\
 Just perform all whole process.
-
-\
-\
-\
 
 ### Change default settings:
 Some of default settings can be changed using „default.conf” text file. List of available values below:\
