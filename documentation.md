@@ -1,5 +1,6 @@
 **Note: To use SAT you must run it with root access (needed to mount files).**\
-**Note: On ANDROID you can operate on mounted image using ONLY TERMINAL !!!**
+**Note: On ANDROID you can operate on mounted image using ONLY TERMINAL !!!**\
+**Note: After flashing a modified system image, it is recommended to resize /system partition**
 
 ### Naming:
 SPARSE_IMG - source .img file that you want to unpack\
@@ -148,7 +149,7 @@ Note : If you want you can do 1. and 2. operation by running:
 ```sh
 sat -a SPARSE_IMG -vndk 26 27 29 -ab2a
 ```
-Tip : When you using -a option, it is nice to use it with -o (if you sure that tool won’t overwrite important files)
+Tip : When you using -a option, it is good practice to use it with -o (if you are sure that tool won’t overwrite important files)
 
 **III. Unpack SPARSE_IMG and mount, do something with files, repack it**
 ```sh

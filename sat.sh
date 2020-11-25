@@ -393,7 +393,7 @@ then
 		if [[ -f "$config_file" ]]
 		then
 			rm -f "android-tool/default.conf"
-			mv -f "config_file" "android-tool/default.conf"
+			mv -f "$config_file" "android-tool/default.conf"
 		fi
 		cp -r android-tool/* "$SAT_DIR/"
 		cp -r android-tool/.version "$SAT_DIR/"
@@ -404,13 +404,18 @@ then
 	cd "$SAT_DIR"
 	rm -rf "$update_dir"
 	
+	#write configs to file
+	echo "SAT_DIR=$SAT_DIR" > update_conf
+	echo "ARCH=$ARCH" >> update_conf
+	echo "ANDROID_BIN=$ANDROID_BIN" >> update_conf
+	echo "TB=$TB" >> update_conf
+	
 	chmod +x install.sh
 	if [[ "$SAT_DIR" == "Linux" ]]
 	then
 		./install.sh -rev1 -linux &> /dev/null
 	else
-        su
-		sh install.sh -rev1 -android &> /dev/null
+		su -c sh install.sh -rev1 -android &> /dev/null
 	fi
 	
 	my_print "Tool was upgraded to v$version_up\n" bold green
@@ -461,6 +466,18 @@ then
 	then
 		source_dir="$start/$source_dir"
 	fi
+	
+	#change raw_dir because too long name for losetup
+	if [[ "$OS_TYPE" == "Android" ]]
+	then
+		if [[ `echo "$raw_dir" | wc -c` -gt 45 ]]
+		then
+			my_print "*** Absolute path of file is too long for mounting...\n" yellow bold
+			my_print "*** RAW_IMG name will be changed\n" yellow bold
+			raw_dir="$start/s.raw_img"
+		fi
+	fi
+	
 	#raw_dir : overwriting
 	if [[ -f "$raw_dir" ]]
 	then
