@@ -411,7 +411,7 @@ then
 	echo "TB=$TB" >> update_conf
 	
 	chmod +x install.sh
-	if [[ "$SAT_DIR" == "Linux" ]]
+	if [[ "$OS_TYPE" == "Linux" ]]
 	then
 		./install.sh -rev1 -linux &> /dev/null
 	else
