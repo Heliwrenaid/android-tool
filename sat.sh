@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#created by: Soul_Hunter24
+
 #SETTINGS
 unpack=0
 repack=0
@@ -537,7 +539,6 @@ then
 		mount_dir="$new_mount_dir"
 	fi
 	raw_dir="$raw_dir_copy"
-	my_print "*** $raw_dir will be mounted in $mount_dir\n"
 
 	#print unpack config
 	print_config "unpack"
@@ -590,7 +591,7 @@ then
 	then
 		touch "$SAT_DIR/.loop.info"
 	fi
-	loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;" | wc -l`
+	loop_inf=`cat $SAT_DIR/.loop.info | grep ":$mount_dir;$raw_dir!" | wc -l`
 	if [[ $loop_inf == 0 ]]
 	then
 		echo "$LOOP:$mount_dir;$raw_dir!" >> "$SAT_DIR/.loop.info"

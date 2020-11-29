@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#created by: Soul_Hunter24
+
 BIN_DIR="/data/local/sat"
 SAT_DIR=`dirname "$(readlink -f "$0")"`
 OS_TYPE=`uname -o`
