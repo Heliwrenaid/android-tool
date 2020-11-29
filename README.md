@@ -49,9 +49,9 @@ $ cd /path/to/sat/directory
 $ chmod +x install.sh
 $ ./install.sh
 ```
-The script will detect your system OS and architecture automatically.\
+The script will detect your system OS and architecture automatically.
 
-**Note:** If SAT can't run after installation then close and open terminal again.\
+**Note:** If SAT can't run after installation then close and open terminal again.
 
 **--- Android ---**\
 <br>
@@ -68,7 +68,7 @@ $ su
 # chmod +x install.sh
 # sh install.sh
 ```
-**Note:** If SAT can't run after installation then close and open terminal again or type "exit" and then "su".\
+**Note:** If SAT can't run after installation then close and open terminal again or type "exit" and then "su".
 
 **(2) TWRP**\
 Just download the special archive from **[releases]** and flash it in TWRP.
@@ -83,15 +83,15 @@ $ su
 
 # Update
 
-**--- Linux ---**\
+**--- Linux ---**
 
 To update SAT run below command:
 ```
 $ sat -update
 ```
-It will do everything automatically and keeps your settings in "default.conf" file.\
+It will do everything automatically and keeps your settings in "default.conf" file.
 
-**--- Android ---**\
+**--- Android ---**
 
 To update SAT on Android you can do this via Termux. Open terminal and run:
 ```
